@@ -1,0 +1,128 @@
+@import "http://fonts.googleapis.com/css?family=Source+Sans+Pro:200,300,400,600,700,900,200italic,300italic,400italic,600italic,700italic,900italic";
+
+@import "compass";
+@import "settings";
+@import "normalize";
+@import "foundation";
+
+$app: #df5d4f; // http://themeforest.net/item/cor-a-fresh-tumblr-theme/full_screen_preview/4239073
+$app: #E74C3C; // Alizarin    (http://designmodo.github.io/Flat-UI/)
+// $app: #1ABC9C; // Turquoise   (http://designmodo.github.io/Flat-UI/)
+// $app: #34495E; // Graphite    (http://designmodo.github.io/Flat-UI/)
+// $app: #3498DB; // Peter River (http://designmodo.github.io/Flat-UI/)
+$app: #efebe3;
+
+$contrast: #df5d4f;
+$contrast: #3498DB;
+$contrast: #E74C3C;
+
+body {
+  padding: 50px 0;
+
+  background: $app;
+
+  color: darken($app, 50);
+  font-family: "Source Sans Pro", Helvetica, Arial, sans-serif;
+  font-weight: 300;
+  line-height: 1.5;
+}
+
+a {
+  // background: $contrast;
+  color: $contrast;
+
+  &:hover {
+    background: $contrast;
+    color: #fff;
+    // position: relative;
+    // top: -2px;
+    // left: -2px;
+
+    // color: #fff;
+    text-shadow:
+      1px 1px 0 darken($contrast, 10),
+      2px 2px 0 darken($contrast, 10),
+      3px 3px 0 darken($contrast, 10);
+  }
+}
+
+h1, h2, h3, h4 {
+  color: darken($app, 20);
+  font-family: "Source Sans Pro", Helvetica, Arial, sans-serif;
+  font-weight: 200;
+}
+
+header {
+  margin: 0;
+
+  img {
+    display: none;
+    border-radius: 50px;
+    width: 100px;
+    height: 100px;
+    margin: -15px 20px 0 0;
+  }
+  h1 a {
+    background: none;
+
+    color: $contrast;
+    font-size: 50pt;
+    font-weight: 200;
+    // text-shadow:
+    //   1px 1px 0 darken($app, 10),
+    //   2px 2px 0 darken($app, 10),
+    //   3px 3px 0 darken($app, 10);
+  }
+}
+
+.byline {
+  // @include box-shadow(0 1px 4px rgba(0,0,0,.35), inset 0 -2px 3px rgba(3,3,3,.1));
+  // border: 5px solid #fff;
+  // border-width: 1px 0;
+
+  background: $contrast;
+
+  h2 {
+    margin-top: 0.5em;
+
+    color: #fff;
+    font-size: 2em;
+    line-height: 1.5;
+  }
+
+  a {
+    padding: 0 5px;
+
+    // background: darken($contrast, 10);
+
+    color: #fff;
+    font-weight: 700;
+    text-shadow:
+      1px 1px 0 darken($contrast, 10),
+      2px 2px 0 darken($contrast, 10),
+      3px 3px 0 darken($contrast, 10);
+
+    &:hover {
+      background: darken($contrast, 10);
+    }
+  }
+}
+
+.posts {
+  padding-top: 1px;
+}
+
+.post {
+  padding-top: 50px;
+  padding-bottom: 50px;
+  border-top: 1px solid lighten($app, 5);
+  border-bottom: 1px solid darken($app, 5);
+
+  &:first-child { border-top: none; }
+  &:last-child  { border-bottom: none; }
+
+  p {
+    font-size: 14pt;
+    font-weight: 300;
+  }
+}
