@@ -1,29 +1,29 @@
 ---
 layout: default
-title: Your New Jekyll Site
+title: Hi, I'm Eric Roberts
 ---
-
 <section class="posts">
-  {% for post in site.posts %}
   <article class="post row">
     <div class="large-4 columns">
-      <h2><a href="{{ post.url }}">{{ post.title }}</a></h2>
+      <h2><a href="{{ site.posts.first.url }}">{{ site.posts.first.title }}</a></h2>
     </div>
     <div class="large-8 columns">
-      {{ post.content }}
+      {{ site.posts.first.content }}
     </div>
   </article>
 </section>
 <section class="more-reading">
-  {% endfor %}
   <div class="row">
     <div class="large-12 columns">
+      <h2>Check out some other posts...</h2>
       <ul class="large-block-grid-4">
         {% for post in site.posts %}
+          {% unless forloop.index == 1 %}
           <li>
             <h4>{{ post.date | date_to_string }}</h4>
             <h2><a href="{{ post.url }}">{{ post.title }}</a></h2>
           </li>
+          {% endunless %}
         {% endfor %}
       </ul>
     </div>
