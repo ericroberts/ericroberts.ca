@@ -7,17 +7,24 @@
 
 $app: #df5d4f; // http://themeforest.net/item/cor-a-fresh-tumblr-theme/full_screen_preview/4239073
 $app: #E74C3C; // Alizarin    (http://designmodo.github.io/Flat-UI/)
-// $app: #1ABC9C; // Turquoise   (http://designmodo.github.io/Flat-UI/)
-// $app: #34495E; // Graphite    (http://designmodo.github.io/Flat-UI/)
-// $app: #3498DB; // Peter River (http://designmodo.github.io/Flat-UI/)
+$app: #1ABC9C; // Turquoise   (http://designmodo.github.io/Flat-UI/)
+$app: #34495E; // Graphite    (http://designmodo.github.io/Flat-UI/)
+$app: #3498DB; // Peter River (http://designmodo.github.io/Flat-UI/)
 $app: #efebe3;
 
 $contrast: #df5d4f;
 $contrast: #3498DB;
 $contrast: #E74C3C;
 
+@mixin standout-text($color: darken($contrast, 10)) {
+  text-shadow:
+    1px 1px 0 $color,
+    2px 2px 0 $color,
+    3px 3px 0 $color;
+}
+
 body {
-  padding: 50px 0;
+  padding: 0 0 50px 0;
 
   background: $app;
 
@@ -32,17 +39,11 @@ a {
   color: $contrast;
 
   &:hover {
-    background: $contrast;
-    color: #fff;
-    // position: relative;
-    // top: -2px;
-    // left: -2px;
+    @include standout-text;
 
-    // color: #fff;
-    text-shadow:
-      1px 1px 0 darken($contrast, 10),
-      2px 2px 0 darken($contrast, 10),
-      3px 3px 0 darken($contrast, 10);
+    background: $contrast;
+
+    color: #fff;
   }
 }
 
@@ -62,27 +63,25 @@ header {
     height: 100px;
     margin: -15px 20px 0 0;
   }
-  h1 a {
-    background: none;
+  h1 {
+    font-size: 64px;
 
-    color: $contrast;
-    font-size: 50pt;
-    font-weight: 200;
-    // text-shadow:
-    //   1px 1px 0 darken($app, 10),
-    //   2px 2px 0 darken($app, 10),
-    //   3px 3px 0 darken($app, 10);
+    a {
+      @include standout-text(darken(#3498db, 10));
+      background: none;
+
+      color: $contrast;
+      color: #fff;
+      font-weight: 200;
+    }
   }
 }
 
 .byline {
-  // @include box-shadow(0 1px 4px rgba(0,0,0,.35), inset 0 -2px 3px rgba(3,3,3,.1));
-  // border: 5px solid #fff;
-  // border-width: 1px 0;
 
   background: $contrast;
 
-  h2 {
+  h1, h2 {
     margin-top: 0.5em;
 
     color: #fff;
@@ -91,18 +90,15 @@ header {
   }
 
   a {
+    @include standout-text;
     padding: 0 5px;
-
-    // background: darken($contrast, 10);
 
     color: #fff;
     font-weight: 700;
-    text-shadow:
-      1px 1px 0 darken($contrast, 10),
-      2px 2px 0 darken($contrast, 10),
-      3px 3px 0 darken($contrast, 10);
 
     &:hover {
+      @include standout-text(darken($contrast, 12));
+
       background: darken($contrast, 10);
     }
   }
