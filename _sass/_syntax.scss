@@ -1,0 +1,22 @@
+.k  { color: #6c71c4; }
+.nc { color: #cb4b17; }
+.o,
+.no { color: #859900; }
+.kp { color: #278bd2; }
+
+.highlight {
+  @include box-shadow(0 1px 3px rgba(0,0,0,0.1));
+
+  padding: 10px 15px;
+  border-radius: 5px;
+  border: 1px solid #fff;
+  background: #fff;
+  overflow-x: auto;
+}
+code {
+  font-size: 14px;
+  font-weight: normal;
+  font-family: 'Ubuntu Mono', 'Inconsolata', 'Liberation Mono', Courier, monospace;
+  // text-shadow: 0 1px 0 rgba(0,0,0,0.5);
+  white-space: pre;
+}
