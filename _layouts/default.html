@@ -11,19 +11,21 @@
   <header>
     <div class="row">
       <div class="columns large-12">
-        <h1><img src="/images/me.jpg" /><a href="/">{{ site.name }}</a></h1>
-      </div>
-    </div>
-    <div class="byline">
-      <div class="row">
-        <div class="columns large-12">
-          <h2>I'm just a guy who likes hockey and sometimes makes things on the internet. I work at <a href="https://twitter.com/ArtBarnLabs">ArtBarnLabs</a>, <a href="https://twitter.com/Printchomp">Printchomp</a>, and <a href="https://twitter.com/20skaters">20skaters</a></h2>
-        </div>
+        <h1><a href="/">{{ site.name }}</a></h1>
       </div>
     </div>
   </header>
+  <div class="byline">
+    <div class="row">
+      <div class="columns large-12">
+        <h2>I'm just a guy who likes hockey and sometimes makes things on the internet. I work at <a href="https://twitter.com/ArtBarnLabs">ArtBarnLabs</a>, <a href="https://twitter.com/Printchomp">Printchomp</a>, and <a href="https://twitter.com/20skaters">20skaters</a></h2>
+      </div>
+    </div>
+  </div>
 
-  {{ content }}
+  <section role="main">
+    {{ content }}
+  </section>
 
   <footer class="row">
   </footer>
