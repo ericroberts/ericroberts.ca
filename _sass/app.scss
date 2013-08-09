@@ -1,20 +1,14 @@
 @import "http://fonts.googleapis.com/css?family=Source+Sans+Pro:200,300,400,600,700,900,200italic,300italic,400italic,600italic,700italic,900italic";
+@import "http://fonts.googleapis.com/css?family=Droid+Sans+Mono";
+@import "http://fonts.googleapis.com/css?family=Inconsolata:400,700)";
+@import "http://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic,700italic)";
 
 @import "compass";
 @import "settings";
 @import "normalize";
 @import "foundation";
-
-$app: #df5d4f; // http://themeforest.net/item/cor-a-fresh-tumblr-theme/full_screen_preview/4239073
-$app: #E74C3C; // Alizarin    (http://designmodo.github.io/Flat-UI/)
-$app: #1ABC9C; // Turquoise   (http://designmodo.github.io/Flat-UI/)
-$app: #34495E; // Graphite    (http://designmodo.github.io/Flat-UI/)
-$app: #3498DB; // Peter River (http://designmodo.github.io/Flat-UI/)
-$app: #efebe3;
-
-$contrast: #df5d4f;
-$contrast: #3498DB;
-$contrast: #E74C3C;
+@import "syntax";
+@import "colors";
 
 @mixin standout-text($color: darken($contrast, 10)) {
   text-shadow:
@@ -34,8 +28,14 @@ body {
   line-height: 1.5;
 }
 
+hr {
+  border: 1px solid darken($app, 2);
+  border-width: 1px 0;
+  border-top-color: lighten($app, 2);
+}
+
 a {
-  // background: $contrast;
+  @include transition(0.1s all ease-in-out);
   color: $contrast;
 
   &:hover {
@@ -48,13 +48,18 @@ a {
 }
 
 h1, h2, h3, h4 {
-  color: darken($app, 20);
+  color: darken($app, 60);
   font-family: "Source Sans Pro", Helvetica, Arial, sans-serif;
   font-weight: 200;
 }
 
-header {
+h4 {
+  color: darken($app, 15);
+}
+
+header.home {
   margin: 0;
+  padding: 50px 0 0 0;
 
   img {
     display: none;
@@ -67,12 +72,41 @@ header {
     font-size: 64px;
 
     a {
-      @include standout-text(darken(#3498db, 10));
       background: none;
 
       color: $contrast;
-      color: #fff;
       font-weight: 200;
+
+      &:hover { color: #fff; background: $contrast }
+    }
+  }
+}
+
+header.post {
+  background: $contrast;
+  padding: 15px 0;
+
+  h1 { 
+    margin: 0; 
+    font-size: 1.5em;
+    a {
+      color: #fff;
+
+      &:hover {
+        @include standout-text(darken($contrast, 12));
+
+        background: darken($contrast, 8);
+      }
+    }
+  }
+  nav { margin: 0; }
+  a {
+    color: #fff;
+
+    &:hover {
+      @include standout-text(darken($contrast, 12));
+
+      background: darken($contrast, 8);
     }
   }
 }
@@ -117,8 +151,60 @@ header {
   &:first-child { border-top: none; }
   &:last-child  { border-bottom: none; }
 
-  p {
-    font-size: 14pt;
+  nav {
+    margin: 0 0 20px 0;
+    font-size: 1.2em;
+  }
+
+  header {
+    padding-top: 0;
+    margin-top: -20px;
+
+    position: relative;
+
+    h1 {
+      font-size: 64px;
+      color: darken($app, 60);
+    }
+    .meta {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      font-size: 2em;
+    }
+  }
+
+  p:first-of-type {
+    font-size: 1.5em;
+    padding-top: 18px;
+  }
+
+  p, ol, ul {
+    font-size: 1.2em;
     font-weight: 300;
+
+    code {
+      @include box-shadow(0 1px 2px rgba(0,0,0,0.05));
+
+      font-size: 0.8em;
+      padding: 5px 8px;
+      margin: 0 3px;
+      position: relative;
+      top: -1px;
+      border-radius: 3px;
+      background: lighten($app, 8);
+      white-space: normal;
+    }
+  }
+
+  ol {
+    color: darken($app, 20);
+
+    li {
+      margin-bottom: 0.5em;
+      span { color: darken($app, 70); }
+    }
   }
 }
+
+@import "cassette";

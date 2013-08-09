@@ -1,12 +1,19 @@
 ---
 layout: default
 ---
+<header class="post">
+  <div class="row">
+    <div class="columns large-12">
+      <nav><a href="/">&laquo; Back to home</a></nav>
+    </div>
+  </div>
+</header>
 <div class="row">
   <div class="columns large-12">
     <article class="post">
       <header>
         <h1>{{ page.title }}</h1>
-        <p class="meta">{{ page.date | date_to_string }}</p>
+        <h4 class="meta">{{ page.date | date_to_string }}</h4>
       </header>
 
       {{ content }}

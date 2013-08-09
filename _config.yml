@@ -1,3 +1,4 @@
 name: "Hi, I'm Eric Roberts"
 markdown: redcarpet
 pygments: true
+permalink: /:year/:month/:day/:title/
