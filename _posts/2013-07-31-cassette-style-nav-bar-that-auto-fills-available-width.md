@@ -25,9 +25,9 @@ $(function() {
   <li class="cassette-filler"><span></span></li>
 </ul>
 
-Recently I was trying to make a nav bar that had "pushed-in" buttons, but I was running into a problem. I needed the nav bar to fill the full width, but I couldn't set a background on it because it would mess with the pushed in effect. Until I found out that `overflow: hidden;` does magical things that I can't explain.
+Recently I was trying to make a nav bar that had "pushed-in" buttons <small>(like cassette tape decks)</small>, but I was running into a problem. I needed the nav bar to fill the full width, but I couldn't set a background on it because it would mess with the display of the pushed in state. Then I found out that `overflow: hidden;` does magical things that I can't explain.
 
-Here's the code for the above navbar.
+Here's the HTML for the above navbar.
 
 {% highlight html linenos %}
 <ul class="cassette">
@@ -53,7 +53,7 @@ The trick is to float each list item left, except for the last one. And on the l
 }
 {% endhighlight %}
 
-Voila! Auto filled width. As for why this works, I have no idea.
+Voila! Auto filled width. As for why this works, I have no idea. I learned this magical trick on [Stack Overflow](http://stackoverflow.com/questions/6572040/make-divs-auto-fill-space).
 
 Here's the whole cassette.scss file, in case you want to copy and use it:
 

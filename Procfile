@@ -1,2 +1,2 @@
-jekyll:  jekyll serve --watch --drafts
+jekyll:  jekyll serve --watch
 compass: compass watch
