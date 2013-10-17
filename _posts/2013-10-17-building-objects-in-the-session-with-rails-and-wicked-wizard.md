@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Building Objects in the Session with Rails and Wicked Wizard"
-date:   2013-08-07
+date:   2013-10-17
 categories: ruby
 ---
 
@@ -125,6 +125,76 @@ class WizardProduct < Product
   def remove_errors_from_other_steps
     other_step_validation_keys = (errors.messages.keys - validations[step])
     errors.messages.reject! { |key| other_step_validation_keys.include?(key) }
+  end
+end
+{% endhighlight %}
+
+OK. What does this do? Well we've got some accessors for the step we're currently on, a list of all the steps, the session itself, and validations we need to perform. Then we store the parent class as a class variable, and get some helper methods related to the parent class that we'll need later.
+
+A key part of this is rewriting the save method. Here, we check if the object is valid, and then remove all the errors we don't care about. Finally, we check if there are no errors. If not, but we're not at the last step yet, we store the attributes of the object in the session. The controller takes care of moving to the next step. If we're at the last step, we instantiate a new instance of the parent model with the attributes we retrieved from the session, and save it. And there you have it! 
+
+### Limitations
+
+There are a couple limitations with the way I'm currently doing things.
+
+1. <span>All attributes must be mass-assignable. This is how I can do `@@parent.new(accessible_attributes)`. There are ways around this, but it makes sense, since you are assigning these attributes through the interface. I'm working on an updated version for Rails 4 that will use strong params instead.</span>
+2. <span>Assocations don't work at all. If you accept nested attributes for things, this just flat out won't work. It is fairly easy to make it work on a case by case basis, but I haven't figured out a generalized solution yet. I'm happy to hear suggestions!</span>
+
+If you have ways you think these limitations could be overcome, or you think I could do certain things better, feel free to get in touch with [me on Twitter](http://twitter.com/eroberts).
+
+### Help
+
+Please help! Accepting pull requests, praise, criticism, and thinly veiled hatred.
+
+### Final notes
+You can find the project on GitHub at [github.com/ericroberts/wizard-object](https://github.com/ericroberts/wizard-object)
+
+By the way, here's the full controller with all the changes we made:
+
+{% highlight ruby linenos %}
+class ProductWizardController < ApplicationController
+  include Wicked::Wizard
+
+  steps :add_name, :add_price, :add_category
+
+  def new
+    product = WizardProduct.new
+
+    session[:product_wizard] ||= {}
+    session[:product_wizard][:product] = product.accessible_attributes
+
+    redirect_to wizard_path(steps.first)
+  end
+
+  def show
+    @pick = WizardProduct.new(session[:product_wizard][:product])
+    @step = step
+
+    render_wizard
+  end
+
+  def update
+    @product = WizardProduct.new(session[:product_wizard][:product])
+    @product.attributes = params[:product]
+
+    @product.step = step
+    @product.steps = steps
+    @product.session = session
+    @product.validations = validations
+
+    render_wizard @product
+  end
+
+  def finish_wizard_path
+    products_path
+  end
+
+  def validations
+    {
+      add_name: [:name],
+      add_price: [:price],
+      add_category: [:category]
+    }
   end
 end
 {% endhighlight %}
