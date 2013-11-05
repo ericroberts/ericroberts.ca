@@ -80,7 +80,7 @@
   @include box-shadow(0 1px 3px rgba(0,0,0,0.1));
 
   padding: 0;
-  border-radius: 5px;
+  border-radius: 3px;
   border: 1px solid #fff;
   background: #fff;
   overflow: auto;
@@ -100,6 +100,22 @@ code {
   font-weight: normal;
   font-family: 'Ubuntu Mono', 'Inconsolata', 'Liberation Mono', Courier, monospace;
   white-space: pre;
+
+  &.bash {
+    background: #143943;
+    display: block;
+    padding: 5px 10px;
+
+    color: lighten(#839496, 10);
+    white-space: pre-wrap;
+
+    .nv, .nb {
+      color: lighten(#839496, 10);
+    }
+    .s2 {
+      color: lighten(#839496, 20);
+    }
+  }
 }
 .lineno {
   background: lighten($app, 5);
