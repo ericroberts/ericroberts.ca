@@ -2,3 +2,11 @@ name: "Hi, I'm Eric Roberts"
 markdown: redcarpet
 pygments: true
 permalink: /:year/:month/:day/:title/
+
+assets:
+  sources:
+    - _assets/images
+    - _assets/javascripts
+    - _assets/stylesheets
+    - _vendors/foundation/scss
+    - _vendors/foundation/js
