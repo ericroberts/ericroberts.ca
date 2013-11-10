@@ -1,0 +1,12 @@
+blockquote {
+  border-left: 1px solid darken($app, 10);
+  padding-left: 1.5em;
+
+  font-family: "Roboto Slab", Georgia;
+  font-weight: 100;
+
+  p {
+    color: darken($app, 80);
+    font-size: 24px;
+  }
+}
