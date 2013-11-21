@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "How to Turn Your Raspberry Pi Into a Wireless AirPlay Reciever"
-date:   2013-10-17
+date:   2013-11-04
 categories: raspberry pi
 ---
 
