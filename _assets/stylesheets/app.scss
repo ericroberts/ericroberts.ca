@@ -5,14 +5,11 @@
 @import "syntax";
 @import "colors";
 @import "blockquote";
+@import "mixins";
 
-@mixin standout-text($color: darken($contrast, 10)) {
-  text-shadow:
-    1px 1px 0 $color,
-    2px 2px 0 $color,
-    3px 3px 0 $color;
+html {
+  background: $app;
 }
-
 body {
   padding: 0 0 50px 0;
 
@@ -22,6 +19,16 @@ body {
   font-family: "Source Sans Pro", Helvetica, Arial, sans-serif;
   font-weight: 300;
   line-height: 1.5;
+}
+
+.wordmark {
+  opacity: 0;
+  @include animation(fadein 0.5s 0.5s both);  
+}
+
+@include keyframes(fadein) {
+    from { opacity: 0; }
+    to   { opacity: 1; }
 }
 
 hr {
@@ -116,6 +123,9 @@ article h1 {
 }
 
 .byline {
+  opacity: 0;
+  @include animation(fadein 1s both);
+  @include animation-delay(1s);
 
   background: $contrast;
 
@@ -144,6 +154,9 @@ article h1 {
 
 .posts {
   padding-top: 1px;
+
+  @include animation(fadein 1s both);
+  @include animation-delay(1.5s);
 }
 
 .post {

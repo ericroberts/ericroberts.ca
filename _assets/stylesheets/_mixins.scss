@@ -1,0 +1,37 @@
+@mixin standout-text($color: darken($contrast, 10)) {
+  text-shadow:
+    1px 1px 0 $color,
+    2px 2px 0 $color,
+    3px 3px 0 $color;
+}
+
+@mixin animation($string) {
+  -webkit-animation: $string;
+  -moz-animation: $string;
+  -o-animation: $string;
+  -ms-animation: $string;
+  animation: $string;
+}
+
+@mixin keyframes($name) {
+  @-webkit-keyframes #{$name} {
+    @content;
+  }
+  @-moz-keyframes #{$name} {
+    @content;
+  }
+  @-ms-keyframes #{$name} {
+    @content;
+  }
+  @keyframes #{$name} {
+    @content;
+  }
+}
+
+@mixin animation-delay($duration) {
+  -webkit-animation-delay: $duration;
+  -moz-animation-delay: $duration;
+  -o-animation-delay: $duration;
+  -ms-animation-delay: $duration;
+  animation-delay: $duration;
+}
