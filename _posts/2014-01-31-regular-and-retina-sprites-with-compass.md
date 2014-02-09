@@ -36,3 +36,13 @@ $sprite-retina: sprite-map("sprite-sprite-retina/*.png");
   }
 }
 {% endhighlight %}
+
+## Usage
+
+Just use the filename without the extension (all files should be .png extension). You'll need to give your element `display: block;` or `display: inline-block;` in order for it to work. You could add this to the mixin if you wanted.
+
+{% highlight css linenos %}
+.someclass {
+  @include sprite-background("file");
+}
+{% endhighlight %}
