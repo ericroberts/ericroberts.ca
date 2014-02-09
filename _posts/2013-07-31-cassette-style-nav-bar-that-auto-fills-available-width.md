@@ -40,7 +40,7 @@ Here's the HTML for the above navbar.
 </ul>
 {% endhighlight %}
 
-The trick is to float each list item left, except for the last one. And on the last one, you also give set overflow to hidden. Here's all that's required for the magic auto-fill width behaviour.
+The trick is to float each list item left, except for the last one. On the last one, you need to set overflow to hidden. Here's all that's required for the magic auto-fill width behaviour.
 
 {% highlight css linenos %}
 .cassette li {
