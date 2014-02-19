@@ -6,7 +6,7 @@ categories: css
 
 So you use compass to build sprites, but now you want everything to have 2x graphics? This mixin should get you up and running.
 
-Bear in mind that you should make sure all images have even dimensions. If you have a 115x115px image in the retina size, you should bump it up to 116x116px and have a regular sized image of 58x58px.
+Bear in mind that you should make sure all images have even dimensions. If you have a 115x115px image in the retina size, you should bump it up to 116x116px and have a regular sized image of 58x58px. This is a slight modification of [this gist](https://gist.github.com/thulstrup/2140082).
 
 {% highlight css linenos %}
 $sprite: sprite-map("sprite-sprite/*.png");
@@ -46,3 +46,5 @@ Just use the filename without the extension (all files should be .png extension)
   @include sprite-background("file");
 }
 {% endhighlight %}
+
+**Edit**: I should have included the original source for this which is [this gist](https://gist.github.com/thulstrup/2140082) by [thulstrup](https://gist.github.com/thulstrup). This solution takes the fix proposed by [rstacruz](https://github.com/rstacruz) in order to avoid hard coding the sprite width manually.
