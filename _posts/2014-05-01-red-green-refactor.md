@@ -55,8 +55,9 @@ So what does this have to do with TDD? Well, TDD is a name that means a lot of t
 
 Maybe when we have discussions about TDD, we should be stating what our definition of TDD is. If we are all arguing about different things, perhaps we could find some common understanding and begin our discussion there. Our first test might fail, but we can figure out how to make it pass and refactor from there.
 
+<small>*Growing a language can be fun. If you haven't already watched [Growing a Language](https://www.youtube.com/watch?v=_ahvzDzKdB0) by Guy Steele, you should! It's a great talk.</small>
 
-## Related Reading
+### Related Reading
 - [TDD is dead. Long live testing.](http://david.heinemeierhansson.com/2014/tdd-is-dead-long-live-testing.html) - DHH
 - [Test-induced design damage](http://david.heinemeierhansson.com/2014/test-induced-design-damage.html) - DHH
 - [Slow database test fallacy](http://david.heinemeierhansson.com/2014/slow-database-test-fallacy.html) - DHH
@@ -64,5 +65,3 @@ Maybe when we have discussions about TDD, we should be stating what our definiti
 - [Test Induced Design Damage?](http://blog.8thlight.com/uncle-bob/2014/05/01/Design-Damage.html) - Uncle Bob
 - [When TDD doesn't work.](http://blog.8thlight.com/uncle-bob/2014/04/30/When-tdd-does-not-work.html) - Uncle Bob
 - [Professionalism and TDD](http://blog.8thlight.com/uncle-bob/2014/05/02/ProfessionalismAndTDD.html) - Uncle Bob
-
-<small>*However, growing a language can be fun. If you haven't already watched [Growing a Language](https://www.youtube.com/watch?v=_ahvzDzKdB0) by Guy Steele, you should! It's a great talk.</small>
