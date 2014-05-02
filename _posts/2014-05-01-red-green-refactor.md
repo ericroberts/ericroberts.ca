@@ -5,6 +5,8 @@ title: Red, Green, Refactor
 
 ![Red, Green, Refactor](/images/posts/red-green-refactor.png)
 
+By Eric Roberts, [@eroberts](http://twitter.com/eroberts)
+
 Ever since DHH's keynote at Railsconf 2014 and his subsequent blog post [TDD is dead. Long live testing.](http://david.heinemeierhansson.com/2014/tdd-is-dead-long-live-testing.html), the development world (or at least the Ruby community) has been abuzz with thoughts on TDD. Uncle Bob and a number of other people have jumped in to give their thoughts on the topic. I figured I may as well jump on the bandwagon myself, because hey, bandwagons are fun right?
 
 One thing I've noticed about all of these posts, forum discussions, and tweets, is that there is a lot of focus on the speed of testing and the importance of decoupling. I must admit to being confused by this focus. TDD, as it was explained to me, is pretty simple:
