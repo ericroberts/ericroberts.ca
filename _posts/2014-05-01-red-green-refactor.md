@@ -3,7 +3,7 @@ layout: post
 title: Red, Green, Refactor
 ---
 
-![Red, Green, Refactor](/images/red-green-refactor.png)
+![Red, Green, Refactor](/images/posts/red-green-refactor.png)
 
 Ever since DHH's keynote at Railsconf 2014 and his subsequent blog post [TDD is dead. Long live testing.](http://david.heinemeierhansson.com/2014/tdd-is-dead-long-live-testing.html), the development world (or at least the Ruby community) has been abuzz with thoughts on Test Driven Development (TDD). Uncle Bob, as well as a number of other influential members of the community, have jumped in to give their thoughts on the topic. I've listed some of these other posts at the bottom for further reading. I figured I may as well jump on the bandwagon myself, because hey, bandwagons are fun right?
 
