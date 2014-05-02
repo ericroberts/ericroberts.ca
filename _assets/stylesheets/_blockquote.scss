@@ -9,4 +9,13 @@ blockquote {
     color: darken($app, 80);
     font-size: 24px;
   }
+
+  cite a,
+  cite a:visited {
+    color: $contrast;
+
+    &:hover {
+      color: #fff;
+    }
+  }
 }
