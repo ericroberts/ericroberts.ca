@@ -3,6 +3,8 @@ layout: post
 title: Red, Green, Refactor
 ---
 
+![Red, Green, Refactor](/images/posts/red-green-refactor.jpg)
+
 Ever since DHH's keynote at Railsconf 2014 and his subsequent blog post [TDD is dead. Long live testing.](http://david.heinemeierhansson.com/2014/tdd-is-dead-long-live-testing.html), I think it would be fair to say there has been a lot of discussion about Test Driven Development (TDD). Uncle Bob responded to DHH's original post with [Monogamous TDD](http://blog.8thlight.com/uncle-bob/2014/04/25/MonogamousTDD.html). A few posts from each followed, which I'll just list out here:
 
 - [Test-induced design damage](http://david.heinemeierhansson.com/2014/test-induced-design-damage.html) - DHH
