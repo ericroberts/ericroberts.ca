@@ -4,7 +4,7 @@ Recently I was watching Uncle Bob's excellent talk [Architecture the Lost Years]
 
 Uncle Bob is right, a fundamental part of TDD is writing the test first. But everyone without their hand up is also a liar. They all do TDD. In fact, they have TDD'd every line of code they've ever written, and you have too.
 
-In my post [Red, Green, Refactor](http://www.ericroberts.ca/2014/05/02/red-green-refactor/) I said how TDD was explained to me originally. Let's take a look: 
+In my post [Red, Green, Refactor](http://www.ericroberts.ca/2014/05/02/red-green-refactor/) I said how TDD was explained to me originally. Let's take a look:
 
 > 1. <span>Write a failing test</span>
 2. <span>Write some code that passes the test</span>
@@ -16,20 +16,21 @@ So does everyone really do this? I guess they better if I'm going to call all th
 - <span>You go to the purchasing system, and try various paths through until you find one that causes the error the user reported.</span>
 - <span>You write some code, then try the permutation that had previously failed to see if it now works as expected.</span>
 
-That doesn't sound so different from TDD, does it? Every time you open your browser and check to see the thing you expected to happen, that's a test. Every time you open your console and check the result of calling some method, that's a test. You've tested your code. How else would you know that it works? 
+That doesn't sound so different from TDD, does it? Every time you open your browser and check to see the thing you expected to happen, that's a test. Every time you open your console and check the result of calling some method, that's a test. You've tested your code. How else would you know that it works?
 
-You may have noticed I skipped a step. In my original definition of TDD step three is refactor. We've really only covered two steps here. In practice, I find that people who are not writing tests for their code often do not do the refactor step. It's just too exhausting. In the simplest case, testing that something works involves switching from your code to the browser, refreshing the page, and seeing what you expected to see on the screen. But most of the interesting things on your site (and therefore the most prone to bugs) involve more than that. In order to test the bug we described above you would likely have to follow steps like this: 
+You may have noticed I skipped a step. In my original definition of TDD step three is refactor. We've really only covered two steps here. In practice, I find that people who are not writing tests for their code often do not do the refactor step. It's just too exhausting. In the simplest case, testing that something works involves switching from your code to the browser, refreshing the page, and seeing what you expected to see on the screen. But most of the interesting things on your site (and therefore the most prone to bugs) involve more than that. In order to test the bug we described above you would likely have to follow steps like this:
 
 - Find a product
 - Add it to your cart
-- Fill in your shipping details 
+- Fill in your shipping details
 - Fill in your credit card information
 - Hit purchase button
 - See if purchase was completed successfully
+- Repeat steps above with different conditions to make sure we didn't break anything
 
 When you have to do all that every time you make a change, are you really going to want to refactor? Even if you are willing to do that now, I wouldn't be willing to bet that future programmers who come across the code are going to want to touch any more than they absolutely have to.
 
-That's because, while we have TDD'd our code, we haven't written [Self-Testing Code](http://www.martinfowler.com/bliki/SelfTestingCode.html). 
+That's because, while we have TDD'd our code, we haven't written [Self-Testing Code](http://www.martinfowler.com/bliki/SelfTestingCode.html).
 
 [Martin Fowler](http://martinfowler.com/) says of Self-Testing Code that:
 
