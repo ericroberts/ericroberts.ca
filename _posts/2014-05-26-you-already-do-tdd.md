@@ -10,7 +10,7 @@ In my post [Red, Green, Refactor](http://www.ericroberts.ca/2014/05/02/red-green
 2. <span>Write some code that passes the test</span>
 3. <span>Refactor</span>
 
-So does everyone really do this? I guess they better if I'm going to call all those people liars. Let's take a look from the perspective of a bug being reported by a user in our system. The typical process probably looks like this:
+So does everyone really do this? I guess they better if I'm going to call all those people liars. Let's take a look from the perspective of a bug being reported by a user in our system:
 
 - <span>A user reports that they can no longer purchase something from your site.</span>
 - <span>You go to the purchasing system, and try various paths through until you find one that causes the error the user reported.</span>
