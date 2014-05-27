@@ -1,4 +1,4 @@
-# You Already Do TDD
+# You're Already Doing TDD
 
 Recently I was watching Uncle Bob's excellent talk [Architecture the Lost Years](https://www.youtube.com/watch?v=WpkDN78P884) on YouTube. At one point he stops and asks who practices Test Driven Development (TDD). While you can't see the audience, it is fairly easy to tell that some of the crowd raise their hands. He then asks how many people write the tests first. At this point it's apparent from his reaction that a lot of people lowered their hands and he tells them that unless you write the tests first, you're not doing TDD.
 
