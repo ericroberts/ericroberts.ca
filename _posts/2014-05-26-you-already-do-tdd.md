@@ -1,8 +1,8 @@
 # You're Already Doing TDD
 
-Recently I was watching Uncle Bob's excellent talk [Architecture the Lost Years](https://www.youtube.com/watch?v=WpkDN78P884) on YouTube. At one point he stops and asks who practices Test Driven Development (TDD). While you can't see the audience, it is fairly easy to tell that some of the crowd raise their hands. He then asks how many people write the tests first. At this point it's apparent from his reaction that a lot of people lowered their hands and he tells them that unless you write the tests first, you're not doing TDD.
+I recently watched Uncle Bob's talk [Architecture the Lost Years](https://www.youtube.com/watch?v=WpkDN78P884) on YouTube. At one point he stops and asks the audience who practices Test Driven Development (TDD). By his reaction, it's apparent that not many people have their hands up.
 
-Uncle Bob is right, a fundamental part of TDD is writing the test first. But everyone without their hand up is also a liar. They all do TDD. In fact, they have TDD'd every line of code they've ever written, and you have too.
+I would argue that everyone without their hand up is a liar. They all do TDD. In fact, they have TDD'd every line of code they've ever written, and you have too.
 
 In my post [Red, Green, Refactor](http://www.ericroberts.ca/2014/05/02/red-green-refactor/) I said how TDD was explained to me originally. Let's take a look:
 
