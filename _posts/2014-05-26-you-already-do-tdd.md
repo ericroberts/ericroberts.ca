@@ -18,7 +18,7 @@ So does everyone really do this? I guess they better if I'm going to call all th
 
 That doesn't sound so different from TDD, does it? Every time you open your browser and check to see the thing you expected to happen, that's a test. Every time you open your console and check the result of calling some method, that's a test. You've tested your code. How else would you know that it works?
 
-You may have noticed I skipped a step. In my original definition of TDD step three is refactor. We've really only covered two steps here. In practice, I find that people who are not writing tests for their code often do not do the refactor step. It's just too exhausting. In the simplest case, testing that something works involves switching from your code to the browser, refreshing the page, and seeing what you expected to see on the screen. But most of the interesting things on your site (and therefore the most prone to bugs) involve more than that. In order to test the bug we described above you would likely have to follow steps like this:
+You may have noticed I skipped a step. In my original definition of TDD, step three is refactor. We've really only covered two steps here. In practice, I find that people who are not writing tests for their code often do not do the refactor step. It's just too exhausting. In the simplest case, testing that something works involves switching from your code to the browser, refreshing the page, and seeing what you expected to see on the screen. But most of the interesting things on your site (and therefore the most prone to bugs) involve more than that. In order to test the bug we described above you would likely have to follow steps like this:
 
 - Find a product
 - Add it to your cart
