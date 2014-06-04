@@ -5,6 +5,8 @@ title: You're Already Doing TDD
 
 ![You're Already Doing TDD](/images/posts/already-doing-tdd.png)
 
+Originally posted on the [Boltmade Blog](http://www.boltmade.com/blog/youre-already-doing-tdd)
+
 I recently watched Uncle Bob's talk [Architecture the Lost Years](https://www.youtube.com/watch?v=WpkDN78P884) on YouTube. At one point he stops and asks the audience who practices Test Driven Development (TDD). By his reaction, it's apparent that not many people have their hands up.
 
 Everyone without their hand up is wrong. They all do TDD. In fact, they have TDD'd every line of code they've ever written, and you have too.
