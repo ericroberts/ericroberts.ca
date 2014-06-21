@@ -15,9 +15,9 @@ So why don't more people do this? Well, testing is hard. It takes time to learn 
 
 AirBnB just today [posted a great article](http://nerds.airbnb.com/testing-at-airbnb/) about how they went from, in their words, "a handful of brittle tests to a large, resilient suite". There are some good pointers in that post on how to achieve the same thing. To me, there were three important things that stood out:
 
-1. Change your culture to "make testing a first-class citizen". As I mentioned, if nobody believes in it, it's not going to happen. It's also important to avoid the pattern of "we know tests are important, but we're too busy to do it right now". If it's important, it's important. Do it.
-2. The second important thing is to make "the bar to writing tests...so low you can trip over it". Make things easy and people will do them.
-3. And finally: "The important thing is to test all the f***ing time. Even when it’s hard. Especially when it’s hard."
+1. <span>Change your culture to "make testing a first-class citizen". As I mentioned, if nobody believes in it, it's not going to happen. It's also important to avoid the pattern of "we know tests are important, but we're too busy to do it right now". If it's important, it's important. Do it.</span>
+2. <span>The second important thing is to make "the bar to writing tests...so low you can trip over it". Make things easy and people will do them.</span>
+3. <span>And finally: "The important thing is to test all the f***ing time. Even when it’s hard. Especially when it’s hard."</span>
 
 So how do you know if you should be thinking about tests? To me, the test for if you need tests (or more tests), is how comfortable you feel pushing a new build to production. Does it make you hesitate? Do you cross your fingers hoping things will be ok? Do you always do it early in the day so you can be around in case something goes wrong? If so, then maybe considering getting some more tests in there. Deploying shouldn't be a scray process. Tests can help.
 
