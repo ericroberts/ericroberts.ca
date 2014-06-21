@@ -23,7 +23,7 @@ body {
 
 .wordmark {
   opacity: 0;
-  @include animation(fadein 0.5s 0.5s both);  
+  @include animation(fadein 0.5s 0.5s both);
 }
 
 @include keyframes(fadein) {
@@ -89,8 +89,8 @@ header.post {
   background: $contrast;
   padding: 15px 0;
 
-  h1 { 
-    margin: 0; 
+  h1 {
+    margin: 0;
     font-size: 1.5em;
     a {
       color: #fff;
