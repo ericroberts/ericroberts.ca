@@ -47,7 +47,7 @@ So why don't people do it? Well, it's hard. It's another thing to learn. We are 
 
 I can promise you that if you devote the time to learning how to test properly, it will pay off. It will pay off when you almost never have to open a browser to be confident that your application is still working. It will pay off when you don't have to manually enter the same conditions over and over to see if something gives you the results you expect.
 
-I don't write perfect code, and I don't write perfect tests. Right now, when I run my test suite, I'm not 100% sure that every part of of my applications work. But the more I do it, the more my confidence rises. The more I do it, the faster I get at writing tests, and the less time I spend testing things manually. If you've never had the experience of writing an entire feature without opening the browser, and then the first time you test it manually it works as you expected it to, then you're missing out.
+I don't write perfect code, and I don't write perfect tests. Right now, when I run my test suite, I'm not 100% sure that every part of my application works. But the more I do it, the more my confidence rises. The more I do it, the faster I get at writing tests, and the less time I spend testing things manually. If you've never had the experience of writing an entire feature without opening the browser, and then the first time you test it manually it works as you expected it to, then you're missing out.
 
 So remember, you already do TDD, but you could be doing it so much better.
 
