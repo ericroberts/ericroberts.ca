@@ -129,7 +129,7 @@ with confidence. The primary benefit of TDD however, is supposed to be an
 improvement in design. Yet I see people missing out on these design benefits
 even when they write the tests first and try to refactor. One of the problems I
 think is the ease of using factories to generate large quantities of data. From
-here on out I will be showing what I mean by goign through code covered by tests
+here on out I will be showing what I mean by going through code covered by tests
 written with factories, and discussing what other methods of testing might help
 us to uncover design flaws.
 
