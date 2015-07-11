@@ -3,135 +3,27 @@ layout: post
 title: What test factories are hiding from you
 ---
 
-Do you use test factories? If so, you may be missing valuable feedback from your
-tests that could lead to better designs.
+Do you use test factories? You may be missing valuable feedback from your tests
+that could lead to better design.
 
 If you're like me, you've started using factories right about the same time you
-started testing. They are great ways to create lots of data to use in your
-tests. Without them, you would have to create all that data yourself. Recently
-however, I've been rethinking my default "use factories" approach to testing.
-
-Originally my pursuit to remove factories was driven by frustration with test
-times. Working at [Boltmade](https://www.boltmade.com) I see projects come and
-go. What I've noticed as a pattern writing tests in Rails applications is that
-they are incredibly fast at the start, and you don't really have to pay the
-price for using them until a couple of months down the road. For a long time, I
-can keep my test suite under 30 seconds or so (I know there are people who think
-that even this is way too long). But at a certain point, for me it's usually a
-few months in, my test suite jumps from 30 seconds to a minute. And then a
-minute to two minutes. That's when I start to go crazy.
-
-To illustrate why this happens this way, let's take a look at what happens when
-we use factories for our data. We're going to use FactoryGirl because that's
-what I have always used and am therefore most familiar with it.
-
-Here's a factory for my `User` class:
-
-{% highlight ruby linenos %}
-FactoryGirl.define do
-  factory :user do
-    name "Eric Roberts"
-    email "eric@boltmade.com"
-  end
-end
-{% endhighlight %}
-
-In case you're not familiar with factories I'll quickly show you how this is
-used.
-
-{% highlight ruby linenos %}
-user = FactoryGirl.create(:user)
-#=> #<User id: 1, name: "Eric Roberts", email: "eric@boltmade.com">
-
-user.name
-#=> "Eric Roberts"
-
-user.email
-#=> "eric@boltmade.com"
-{% endhighlight %}
-
-Creating the factory actually makes a new User object, triggers it's validations
-and *saves it to the database*. Let's take a look at what happens when you run
-`FactoryGirl.create`.
-
-{% highlight sql linenos %}
-INSERT INTO "users" ("name", "email", "created_at", "updated_at")
-VALUES (?, ?, ?, ?)  [
-	["name", "Eric"],
-	["email", "eric@boltmade.com"],
-	["created_at", "2015-04-21 01:08:49.409179"],
-	["updated_at", "2015-04-21 01:08:49.409179"]
-]
-{% endhighlight %}
-
-This is pretty quick though. It doesn't seem like that big of a deal. And it
-isn't! Not yet anyway. But as a software project grows, object creation tends to
-get a little more complicated. Let's imagine that users now belong to companies.
-
-Now our factories look more like this:
-
-{% highlight ruby linenos %}
-FactoryGirl.define do
-  factory :user do
-    association :company
-
-    name "Eric Roberts"
-    email "eric@boltmade.com"
-  end
-
-  factory :company do
-    name "Boltmade"
-  end
-end
-{% endhighlight %}
-
-Since users now belong to companies, every user created with a factory now does
-the following:
-
-{% highlight sql linenos %}
-INSERT INTO "companies" ("name", "created_at", "updated_at")
-VALUES (?, ?, ?)  [
-	["name", "Boltmade"],
-	["created_at", "2015-04-21 01:22:24.307976"],
-	["updated_at", "2015-04-21 01:22:24.307976"]
-]
-
-INSERT INTO "users" ("name", "email", "company_id", "created_at", "updated_at")
-VALUES (?, ?, ?, ?, ?)  [
-	["name", "Eric"],
-	["email", "eric@boltmade.com"],
-	["company_id", 1],
-	["created_at", "2015-04-21 01:22:24.311557"],
-	["updated_at", "2015-04-21 01:22:24.311557"]
-]
-{% endhighlight %}
-
-This still doesn't take that long, but I'm sure you can see how these things add
-up. The more complex your object graph is, the more time it takes to create. If
-you can save *0.1s per test* on 1200 tests, you'll save *2 minutes* on your test
-suite run. I don't know about you, but that's pretty awesome to me.
-
-This is the point where people who are familiar with FactoryGirl say to me
-"don't you know about `build_stubbed`?". The answer is yes, I do know about it.
-The point still stands however. Creating objects, database or not, still takes
-time. That said, if you are trying to increase the speed of your factories, it
-is certainly a good way.
-
-If speed were the only thing wrong with factories, then finding a faster way
-to make factories is a good approach. But I think there are more downsides to
-using factories.
+started testing. They are a great way to create a lot of data to use in your
+tests. Without them, you would have to do all of that hard work yourself.
+Recently however, I've been rethinking my default "use factories" approach to
+testing.
 
 ## Factories make bad design easy
 
-Let's talk for a second about Test Driven Development (TDD). TDD promises a
-number of benefits. The self-testing code that results can allow you to refactor
+Test Driven Development (TDD) offers a number of benefits. The self-testing code
+that results from diligent application of TDD allows you to refactor your code
 with confidence. The primary benefit of TDD however, is supposed to be an
-improvement in design. Yet I see people missing out on these design benefits
-even when they write the tests first and try to refactor. One of the problems I
-think is the ease of using factories to generate large quantities of data. From
-here on out I will be showing what I mean by going through code covered by tests
-written with factories, and discussing what other methods of testing might help
-us to uncover design flaws.
+improvement in design <sup><a href="#references">[1]</a></sup>. Yet I see people
+missing out on these design benefits even when they write the tests first and
+spend the time to refactor. I think that one of the problems is the ease of
+using factories to generate large quantities of data. From here on out I will be
+showing what I mean by going through code covered by tests written with
+factories, and discussing what other methods of testing might help us to uncover
+design flaws.
 
 To begin, I will explain the feature that we are trying to build. The project's
 requirements are to build a feature that returns me the minimum and maximum
@@ -230,23 +122,14 @@ class Rate < ActiveRecord::Base
 end
 {% endhighlight %}
 
-This test runs fairly quickly. 0.0482 seconds to be precise:
+Doesn't look too bad, does it? Let's see what we can discover by refusing to use
+factories.
 
-{% highlight bash linenos %}
-.
+## Without factories
 
-Finished in 0.0482 seconds (files took 0.38182 seconds to load)
-1 example, 0 failures
-{% endhighlight %}
-
-It still has to insert things into the database however. Also, this is running
-on my example code, which doesn't have a full Rails application, rather I just
-used ActiveRecord itself. It would be slower on the real thing.
-
-So now, as an exercise, we're going to write this without using factories at
-all. This means we will have to provide all the data ourselves. I'm going to
-choose to do this with stubs. Here's what the same test looks like when we
-stub all of our data:
+We're going to write this without using factories at all. This means we will
+have to provide all the data ourselves. I'm going to choose to do this with
+stubs. Here's what the same test looks like when we stub all of our data:
 
 {% highlight ruby linenos %}
 RSpec.describe Estimator do
@@ -274,23 +157,10 @@ RSpec.describe Estimator do
 end
 {% endhighlight %}
 
-Now, the time it takes to run them is much shorter:
-
-{% highlight bash linenos %}
-.
-
-Finished in 0.0171 seconds (files took 0.40143 seconds to load)
-1 example, 0 failures
-{% endhighlight %}
-
-That's almost *3x* faster! I am aware the times we are talking about right now
-are trivial, but if you expand them to your entire test suite, a 3x improvement
-would be significant.
-
-Stubbing all of those methods though is painful. And worse, if any of the
-methods being called change, we'll have to change the stubs. That's not very
-good. And yet, I will argue that this pain is a good thing. This pain is
-alerting us to the presence of bad design.
+Stubbing all of those methods is painful. And worse, if any of the methods being
+called change, we'll have to change the stubs. That's not very good. And yet, I
+will argue that this pain is a good thing. This pain is alerting us to the
+presence of bad design.
 
 If we look at those tests, what is that we are stubbing? First we have to stub
 the customers method to return our own Customer double. Then we have to stub not
@@ -433,7 +303,7 @@ So just how do we go about doing this? It's important to remember here that `*`
 is just another method. `1 * 2` is just syntax that calls the method `*` on `1`
 and passes `2` as the argument. There is special syntax that allows us to
 leave off the `.` which makes it look different. If we imagined that `*` was
-really called `multiply_by`, it would look like this: `1.multiply_by(2)`.
+really called `times`, it would look like this: `1.times(2)`.
 
 With that knowledge, we can go ahead and implement the `*` method on Rate.
 Here's our test:
@@ -766,3 +636,14 @@ I would love to hear them! You can comment here, on the
 [@eroberts](https://twitter.com/eroberts).
 
 Good luck with your testing!
+
+<h2 id="references">References</h2>
+
+<ol>
+  <li>
+    <a
+  href="http://blog.testdouble.com/posts/2014-01-25-the-failures-of-intro-to-tdd.html">
+      The Failures of "Intro to TDD"
+    </a>
+  </li>
+</ol>
