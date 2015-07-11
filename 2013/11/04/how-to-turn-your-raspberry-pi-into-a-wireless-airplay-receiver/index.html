@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>How to Turn Your Raspberry Pi Into a Wireless AirPlay Reciever</title>
+  <meta name="viewport" content="width=device-width">
+  <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:200,300,400,600,700,900,200italic,300italic,400italic,600italic,700italic,900italic' rel='stylesheet' type='text/css'>
+  <link href='http://fonts.googleapis.com/css?family=Roboto+Slab:400,300,100' rel='stylesheet' type='text/css'>
+  <link href='http://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="/assets/app-a847808fceed40565a1baba14ea3b020.css">
+</head>
+<body>
+  <section role="main">
+    <header class="post">
+  <div class="row">
+    <div class="columns large-12">
+      <nav><a href="/">&laquo; Back to home</a></nav>
+    </div>
+  </div>
+</header>
+<div class="row">
+  <div class="columns large-12">
+    <article class="post">
+      <header>
+        <h4 class="meta">04 Nov 2013</h4>
+        <h1>How to Turn Your Raspberry Pi Into a Wireless AirPlay Reciever</h1>
+      </header>
+
+      <div class="post-content">
+        <p>A while ago I had some brilliant idea to do something, so I bought two <a href="http://www.raspberrypi.org/">Raspberry Pi&#39;s</a>. Because I never follow up on things, they were still sitting in their packaging nearly a year later. Then someone brought one into <a href="http://artbarnlabs.com/">ArtBarn Labs</a>, where I work, and we started using it as an AirPlay receiver. It was pretty cool, so I demoed it at <a href="http://www.democampguelph.com/">DemoCampGuelph</a>. But it took a while to get working, so I figured I&#39;d document the process.</p>
+
+<p>At DemoCamp, I only showed it off using ethernet, although I told people you could do it wirelessly. Out of the box, the Raspberry Pi only has ethernet, so I had to figure that out. This is a guide to how I did the whole process, step by step, since I had to compile my instructions from a few different locations. Let&#39;s get started!</p>
+
+<h2>Things you&#39;ll need</h2>
+
+<ul>
+<li>A Raspberry Pi</li>
+<li>A WiFi adapter. This guide will assume you are using the <a href="http://www.amazon.ca/TP-LINK-TL-WN725N-Wireless-Adapter-Miniature/dp/B008IFXQFU/">TP-LINK TL-WN725N</a> since that&#39;s what I used.</li>
+<li>An SD card with Raspian on it. Don&#39;t worry, I&#39;ll tell you how to do that too.</li>
+<li>A USB keyboard and mouse in order to configure the Raspberry Pi.</li>
+<li>A micro USB cable and some power source to plug it into.</li>
+<li>A monitor to connect the Raspberry Pi to.</li>
+<li>An HDMI cable to connect to the monitor. Yes, I&#39;m really spelling out the detail this much.</li>
+</ul>
+
+<p>I&#39;m also going to assume you&#39;re using a Mac, but that is really only important for the first step, and I&#39;m sure you can find alternative instructions elsewhere. I may even tell you where.</p>
+
+<h2>Step 1: Get Raspian</h2>
+
+<p>You&#39;ll need to download it, unzip it, and write it to an SD card.</p>
+
+<ol>
+<li><span><a href="http://www.raspberrypi.org/downloads">Get Raspian</a>. I used this specific version: <code>2013-09-25-wheezy-raspbian.zip</code></span></li>
+<li><span>Get it on an SD card. There are instructions for every operating system <a href="http://elinux.org/RPi_Easy_SD_Card_Setup">here</a>. Since I&#39;m giving specific instructions for my setup, I used <a href="http://alltheware.wordpress.com/2012/12/11/easiest-way-sd-card-setup/">RPi-sd card builder</a>. Follow the instructions on that page and it should be good to go. FYI I&#39;m running Mavericks and this program worked fine.</span></li>
+<li><span>Put the SD card in the Pi!</span></li>
+</ol>
+
+<h2>Step 2: Setup Some Stuff on The Pi</h2>
+
+<p>Plug in your mouse and keyboard to the Pi. Also make sure you plugin an ethernet cable, and HDMI, blah blah blah I think you get it. Obviously plug in the micro USB as well so you get some power. When you turn it on you should see something like the following:</p>
+
+<p><img src="/images/posts/raspi-config.png" alt="Picture of raspi-config"></p>
+
+<p>Do the following:</p>
+
+<ol>
+<li><span>Expand root partition to fill SD card. Unless you did weird things like partition your SD card and you don&#39;t want to use the full space. But seriously... why would you do that?</span></li>
+<li><span>Setup SSH. Select the ssh option, hit enter, and follow the prompts.</span></li>
+<li><span>Select start desktop on boot for boot behaviour.</span></li>
+<li><span>Hit &lt;Finish&gt;</span></li>
+</ol>
+
+<p>Ok cool. So now we&#39;ve got some initial setup. It probably asked you if you wanted to reboot or it just did it for you, I don&#39;t remember exactly. If you ran into errors, well you&#39;re probably screwed. Or you know, you could google it.</p>
+
+<h2>Step 3: Update ALL THE THINGS!</h2>
+
+<p>Ok now we&#39;re going to upgrade everything because that&#39;s what the cool kids are doing. Of course, doing this means that this guide might not be of much help at some point in the future. But what the hell. Maybe I&#39;ll even update this thing at some point (not likely).</p>
+
+<p>So do this:</p>
+
+<div class="highlight"><pre><code class="language-bash" data-lang="bash">sudo apt-get update
+sudo apt-get upgrade</code></pre></div>
+
+<p>That should take a while. When it&#39;s done, do this:</p>
+
+<div class="highlight"><pre><code class="language-bash" data-lang="bash">sudo rpi-update</code></pre></div>
+
+<p>That should also take a while.</p>
+
+<p>...</p>
+
+<p>All done? Good, now let&#39;s install a bunch of stuff. I don&#39;t know what it does, but I copied and pasted it off the internet, so how bad can it be? By the way, I got this stuff from a Lifehacker guide: <a href="http://lifehacker.com/5978594/turn-a-raspberry-pi-into-an-airplay-receiver-for-streaming-music-in-your-living-room">Turn a Raspberry Pi Into an AirPlay Receiver for Streaming Music in Your Living Room</a>. Title sounds an awful lot like mine doesn&#39;t it? I&#39;m 90% just ripping off their article. </p>
+
+<div class="highlight"><pre><code class="language-bash" data-lang="bash">sudo apt-get install git libao-dev libssl-dev libcrypt-openssl-rsa-perl libio-socket-inet6-perl libwww-perl avahi-utils libmodule-build-perl</code></pre></div>
+
+<p>Ok, so now we&#39;ve installed a bunch of stuff, hopefully we didn&#39;t mess shit up.</p>
+
+<h2>Step 4: Get the WiFi thing all the kids are talking about.</h2>
+
+<p>Now, you&#39;ve got that USB WiFi thing right? Good. Leave it wherever it is. Unless it&#39;s plugged into the Raspberry Pi, then you need to remove that. We&#39;re gonna do some stuff so your Raspberry Pi can actually know that there is a USB adapter plugged in because it didn&#39;t recognize mine at first.</p>
+
+<p>This next bit I found on a Raspberry Pi forum post: <a href="http://www.raspberrypi.org/phpBB3/viewtopic.php?t=57426">Wifi setup with the TP Link WN725N</a>.</p>
+
+<p>Type this in your terminal so we know what version of Raspian we&#39;re using:</p>
+
+<div class="highlight"><pre><code class="language-bash" data-lang="bash">uname -a</code></pre></div>
+
+<p>Mine says this:</p>
+
+<div class="highlight"><pre><code class="language-bash" data-lang="bash">Linux raspberrypi 3.6.11+ <span class="c">#557 PREEMPT Wed Oct 2 18:49:09 BST 2013 armv6l GNU/Linux</span></code></pre></div>
+
+<p>OK, now do this:</p>
+
+<div class="highlight"><pre><code class="language-bash" data-lang="bash">wget https://dl.dropboxusercontent.com/u/80256631/8188eu-20130830.tar.gz
+tar -zxvf 8188eu-20130830.tar.gz
+sudo install -p -m <span class="m">644</span> 8188eu.ko /lib/modules/3.6.11+/kernel/drivers/net/wireless
+sudo insmod /lib/modules/3.6.11+/kernel/drivers/net/wireless/8188eu.ko
+sudo depmod -a</code></pre></div>
+
+<p>If <code>uname -a</code> returned something different than mine did, you&#39;ll want to visit that forum link and see which driver to install.</p>
+
+<p>So now if you&#39;ve rebooted you should be able to launch &quot;WIFI Config&quot; from your desktop and you should see <code>wlan0</code> in your adapter dropdown. From here you should be able to find your desired network and connect. You can find more detailed instructions <a href="http://thepihut.com/pages/how-to-setup-wifi-on-your-raspberry-pi-raspbian">here</a>.</p>
+
+<p>If everything went well you should be able to disconnect your Pi from ethernet and connect over WiFi only! If it didn&#39;t work... hopefully you know how to use Google well.</p>
+
+<h2>Step 5: Shairport!</h2>
+
+<p>So now we can finally get to that awesome AirPlay receiver program. This is from that <a href="http://lifehacker.com/5978594/turn-a-raspberry-pi-into-an-airplay-receiver-for-streaming-music-in-your-living-room">Lifehacker article</a> again.</p>
+
+<p>Let&#39;s do this:</p>
+
+<div class="highlight"><pre><code class="language-bash" data-lang="bash">git clone https://github.com/hendrikw82/shairport.git
+<span class="nb">cd </span>shairport
+make</code></pre></div>
+
+<p>We still have more to do, but we should be able to see if this thing at least works now. Do the following:</p>
+
+<div class="highlight"><pre><code class="language-bash" data-lang="bash">./shairport.pl -a AirPi</code></pre></div>
+
+<p>You can replace AirPi with anything you want. For example I have KitchenPi and LivingPi.</p>
+
+<p>It didn&#39;t work right? If it did, you can ignore this next part. If you got an error along the lines of <code>Can&#39;t locate Net/SDP.pm</code> then we need to run the following:</p>
+
+<div class="highlight"><pre><code class="language-bash" data-lang="bash">cpan install Net::SDP</code></pre></div>
+
+<p>More details about that last thing can be found on StackExchange: <a href="http://raspberrypi.stackexchange.com/questions/5310/problem-installing-netsdp">Problem installing Net::SDP</a>.</p>
+
+<p>OK, now you should be able to actually do that thing we tried to do:</p>
+
+<div class="highlight"><pre><code class="language-bash" data-lang="bash">./shairport.pl -a LiedToMeTheFirstTimePi</code></pre></div>
+
+<p>Hooray it works! You should be able to see LiedToMeTheFirstTimePi as an AirPlay source from your Mac or iOS device.</p>
+
+<p>You could keep running that command everytime you booted your Pi in order to make it work, but you probably want to have it happen automatically right?</p>
+
+<p>Once again, we&#39;ll copy stuff from the Lifehacker article:</p>
+
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nb">cd </span>shairport
+make install
+cp shairport.init.sample /etc/init.d/shairport
+<span class="nb">cd</span> /etc/init.d
+chmod a+x shairport
+update-rc.d shairport defaults</code></pre></div>
+
+<p>Then we need to add it as a launch item.</p>
+
+<div class="highlight"><pre><code class="language-bash" data-lang="bash">sudo nano shairport</code></pre></div>
+
+<p>From Lifehacker: &quot;This loads up Shairport file we need to edit. Look through the file for the &quot;DAEMON_ARGS&quot; line, and change it so it looks like this&quot;:</p>
+
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">DAEMON_ARGS</span><span class="o">=</span><span class="s2">&quot;-w $PIDFILE -a AirPi&quot;</span></code></pre></div>
+
+<p>Again, change AirPi to whatever you want it to be called when you view a list of AirPlay receivers.</p>
+
+<p>Save the file (ctrl+x) and you&#39;re good!</p>
+
+<h2>Conclusion</h2>
+
+<p>Hopefully that all went fine for you, but in case it didn&#39;t you should be able to find your solution elsewhere on the internet. If I could be a little bit of help to you then I&#39;ve done my job.</p>
+
+<p>Here&#39;s a list of resources that I used:</p>
+
+<ol>
+<li><span><a href="http://lifehacker.com/5978594/turn-a-raspberry-pi-into-an-airplay-receiver-for-streaming-music-in-your-living-room">Lifehacker: Turn a Raspberry Pi Into an AirPlay Receiver for Streaming Music in Your Living Room</a></span></li>
+<li><span><a href="http://www.raspberrypi.org/phpBB3/viewtopic.php?t=57426">Wifi setup with the TP Link WN725N</a></li>
+<li><span><a href="http://raspberrypi.stackexchange.com/questions/5310/problem-installing-netsdp">Problem installing Net::SDP</a></span></li>
+<li><span><a href="http://google.com">Google</a></span></li>
+</ol>
+
+      </div>
+
+      <footer>
+      </footer>
+      <div id="disqus_thread"></div>
+      <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'ericroberts'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+      </script>
+      <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+      <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    </article>
+  </div>
+</div>
+
+  </section>
+
+  <footer>
+    <div class="row">
+    </div>
+  </footer>
+  <script type="text/javascript">
+
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-16269631-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+
+  </script>
+
+  <script type="text/javascript">
+    window.analytics=window.analytics||[],window.analytics.methods=["identify","group","track","page","pageview","alias","ready","on","once","off","trackLink","trackForm","trackClick","trackSubmit"],window.analytics.factory=function(t){return function(){var a=Array.prototype.slice.call(arguments);return a.unshift(t),window.analytics.push(a),window.analytics}};for(var i=0;i<window.analytics.methods.length;i++){var key=window.analytics.methods[i];window.analytics[key]=window.analytics.factory(key)}window.analytics.load=function(t){if(!document.getElementById("analytics-js")){var a=document.createElement("script");a.type="text/javascript",a.id="analytics-js",a.async=!0,a.src=("https:"===document.location.protocol?"https://":"http://")+"cdn.segment.io/analytics.js/v1/"+t+"/analytics.min.js";var n=document.getElementsByTagName("script")[0];n.parentNode.insertBefore(a,n)}},window.analytics.SNIPPET_VERSION="2.0.9",
+    window.analytics.load("ixl7f3o7kf");
+    window.analytics.page();
+  </script>
+</body>
+</html>

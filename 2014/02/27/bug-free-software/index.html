@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Bug Free Software - Is it Possible?</title>
+  <meta name="viewport" content="width=device-width">
+  <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:200,300,400,600,700,900,200italic,300italic,400italic,600italic,700italic,900italic' rel='stylesheet' type='text/css'>
+  <link href='http://fonts.googleapis.com/css?family=Roboto+Slab:400,300,100' rel='stylesheet' type='text/css'>
+  <link href='http://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="/assets/app-a847808fceed40565a1baba14ea3b020.css">
+</head>
+<body>
+  <section role="main">
+    <header class="post">
+  <div class="row">
+    <div class="columns large-12">
+      <nav><a href="/">&laquo; Back to home</a></nav>
+    </div>
+  </div>
+</header>
+<div class="row">
+  <div class="columns large-12">
+    <article class="post">
+      <header>
+        <h4 class="meta">27 Feb 2014</h4>
+        <h1>Bug Free Software - Is it Possible?</h1>
+      </header>
+
+      <div class="post-content">
+        <p>Recently the company I work at, <a href="http://www.boltmade.com/">Boltmade</a>, was undergoing a rebranding. Naturally we looked at the websites of other software development companies to see what they were saying about themselves. To me, one site stood out. <a href="http://8thlight.com/">8th Light</a> says in their <a href="http://www.8thlight.com/principles">company principles</a> that, &quot;we take responsibility for the correctness of our code by testing it thoroughly. We do not tolerate preventable defects&quot;. Going further, the <a href="http://blog.8thlight.com/eric-smith/2013/04/08/we-are-principled-6.html">blog post</a> that accompanies this says, &quot;if we make a mistake, we&#39;ll fix it quickly—for free. It&#39;s that simple&quot;.</p>
+
+<p>I think what strikes me most about this is that it&#39;s surprising at all. Why shouldn&#39;t this just be how software development is done? Why do we just accept that all software will have bugs? It is true that is technically impossible to remove all possible bugs from a piece of software. But I think that an over acceptance of this is leading us to create software with far more defects than should be acceptable.</p>
+
+<p>It may be impossible to remove every final last bug, but I can definitely guarantee that everything I know about works correctly if I&#39;m doing my job. An article I read recently (<a href="http://www.infoworld.com/d/developer-world/bug-free-software-dream-554">Bug Free Software? Dream on</a>) stresses the impossibility of getting rid of all bugs. In particular one phrase bothered me. The article says that, &quot;developers play whack-a-mole&quot; with bugs. This bothers me because in whack-a-mole, the moles come back out of the same hole some undetermined time after you knocked them down in the first place. In a way, it&#39;s a perfect description of the experience of many developers. They fix one bug over here, rush to put out a fire over there, and when they come back they find that somehow the first bug has come back again. However, there is no reason developers should ever play whack-a-mole with bugs. Proper testing should ensure that when you fix a bug it stays fixed.</p>
+
+<p>The only way someone can deliver on their promise of bug free software is to test it thoroughly. I don&#39;t really care if that means you clicked every path through the system, and tried every use case. If you&#39;d rather do that over writing tests, be my guest. Just remember you&#39;ll be doing it every time you change anything. As for me, I&#39;ll write the tests once and have them catch things for me from then on.</p>
+
+<p>So why don&#39;t more people do this? Well, testing is hard. It takes time to learn how to test, it takes time to setup the tools to test, and it takes time to run the tests (much less time than it would to click through every path in the system, although I would argue that almost nobody actually does this when they say they tested it manually). But that doesn&#39;t mean it&#39;s not worth it. Investing the time in this area will pay off. But if you don&#39;t make testing a priority, figure out how to set it up, and ensure that everyone is running the tests, you won&#39;t see any benefit. It takes buy in from everyone. If one person is over in their corner diligently writing tests and nobody else does, you will still have a fragile application.</p>
+
+<p>AirBnB just today <a href="http://nerds.airbnb.com/testing-at-airbnb/">posted a great article</a> about how they went from, in their words, &quot;a handful of brittle tests to a large, resilient suite&quot;. There are some good pointers in that post on how to achieve the same thing. To me, there were three important things that stood out:</p>
+
+<ol>
+<li><span>Change your culture to &quot;make testing a first-class citizen&quot;. As I mentioned, if nobody believes in it, it&#39;s not going to happen. It&#39;s also important to avoid the pattern of &quot;we know tests are important, but we&#39;re too busy to do it right now&quot;. If it&#39;s important, it&#39;s important. Do it.</span></li>
+<li><span>The second important thing is to make &quot;the bar to writing tests...so low you can trip over it&quot;. Make things easy and people will do them.</span></li>
+<li><span>And finally: &quot;The important thing is to test all the f***ing time. Even when it’s hard. Especially when it’s hard.&quot;</span></li>
+</ol>
+
+<p>So how do you know if you should be thinking about tests? To me, the test for if you need tests (or more tests), is how comfortable you feel pushing a new build to production. Does it make you hesitate? Do you cross your fingers hoping things will be ok? Do you always do it early in the day so you can be around in case something goes wrong? If so, then maybe considering getting some more tests in there. Deploying shouldn&#39;t be a scray process. Tests can help.</p>
+
+<p>I&#39;m happy to hear your thoughts, please leave comments below! I could ramble on this topic for a while but I don&#39;t want to write a huge wall of text. I&#39;m happy to continue the discussion in the comments or write a follow up post.</p>
+
+      </div>
+
+      <footer>
+      </footer>
+      <div id="disqus_thread"></div>
+      <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'ericroberts'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+      </script>
+      <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+      <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    </article>
+  </div>
+</div>
+
+  </section>
+
+  <footer>
+    <div class="row">
+    </div>
+  </footer>
+  <script type="text/javascript">
+
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-16269631-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+
+  </script>
+
+  <script type="text/javascript">
+    window.analytics=window.analytics||[],window.analytics.methods=["identify","group","track","page","pageview","alias","ready","on","once","off","trackLink","trackForm","trackClick","trackSubmit"],window.analytics.factory=function(t){return function(){var a=Array.prototype.slice.call(arguments);return a.unshift(t),window.analytics.push(a),window.analytics}};for(var i=0;i<window.analytics.methods.length;i++){var key=window.analytics.methods[i];window.analytics[key]=window.analytics.factory(key)}window.analytics.load=function(t){if(!document.getElementById("analytics-js")){var a=document.createElement("script");a.type="text/javascript",a.id="analytics-js",a.async=!0,a.src=("https:"===document.location.protocol?"https://":"http://")+"cdn.segment.io/analytics.js/v1/"+t+"/analytics.min.js";var n=document.getElementsByTagName("script")[0];n.parentNode.insertBefore(a,n)}},window.analytics.SNIPPET_VERSION="2.0.9",
+    window.analytics.load("ixl7f3o7kf");
+    window.analytics.page();
+  </script>
+</body>
+</html>

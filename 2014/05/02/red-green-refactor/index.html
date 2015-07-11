@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Red, Green, Refactor</title>
+  <meta name="viewport" content="width=device-width">
+  <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:200,300,400,600,700,900,200italic,300italic,400italic,600italic,700italic,900italic' rel='stylesheet' type='text/css'>
+  <link href='http://fonts.googleapis.com/css?family=Roboto+Slab:400,300,100' rel='stylesheet' type='text/css'>
+  <link href='http://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="/assets/app-a847808fceed40565a1baba14ea3b020.css">
+</head>
+<body>
+  <section role="main">
+    <header class="post">
+  <div class="row">
+    <div class="columns large-12">
+      <nav><a href="/">&laquo; Back to home</a></nav>
+    </div>
+  </div>
+</header>
+<div class="row">
+  <div class="columns large-12">
+    <article class="post">
+      <header>
+        <h4 class="meta">02 May 2014</h4>
+        <h1>Red, Green, Refactor</h1>
+      </header>
+
+      <div class="post-content">
+        <p><img src="/images/posts/red-green-refactor.png" alt="Red, Green, Refactor"></p>
+
+<p>Ever since DHH&#39;s keynote at Railsconf 2014 and his subsequent blog post <a href="http://david.heinemeierhansson.com/2014/tdd-is-dead-long-live-testing.html">TDD is dead. Long live testing.</a>, the development world (or at least the Ruby community) has been abuzz with thoughts on Test Driven Development (TDD). Uncle Bob, as well as a number of other influential members of the community, have jumped in to give their thoughts on the topic. I&#39;ve listed some of these other posts at the bottom for further reading. I figured I may as well jump on the bandwagon myself, because hey, bandwagons are fun right?</p>
+
+<p>One thing I&#39;ve noticed about all of these posts, forum discussions, and tweets, is that there is a lot of focus on the speed of testing and the importance of decoupling. I must admit to being confused by this focus. TDD, as it was explained to me, is pretty simple:</p>
+
+<ol>
+<li><span>Write a failing test</span></li>
+<li><span>Write some code that passes the test</span></li>
+<li><span>Refactor</span></li>
+</ol>
+
+<p>Red, green, refactor. Notice how it doesn&#39;t say anything about speed? Or whether the tests end up hitting the database? It doesn&#39;t talk about loading Rails in order to run your tests, or the difference between stubs, fakes, and mocks. It just says three simple things: write a test for some new functionality, write some code to pass that test, and then refactor that code.</p>
+
+<p>While many discussions have revolved around speed, DHH seems to also not agree with the test-first approach in general, because in <a href="http://david.heinemeierhansson.com/2014/test-induced-design-damage.html">Test induced design damage</a> he criticizes BDD for being such an approach:</p>
+
+<blockquote>
+<p>At this point BDD proponents might well argue that, yes, testing units is not what we should be doing. We should be going outside-in. But as long as that&#39;s also done under the test-first regime, I don&#39;t think it generally help matters much. It still leads down a road of excessive mocking and artificial boundary installations.</p>
+</blockquote>
+
+<p>I don&#39;t agree that the simple act of testing first needs to lead to excessive mocking. By itself, test-first says nothing about <em>how</em> I write my test, just <em>when</em> I write my test.</p>
+
+<p>The point of testing first is to focus on the task at hand. What functionality am I implementing? Perhaps more importantly, what am I <em>not</em> implementing? Once I&#39;ve figured out what I&#39;m trying to do, I get there the quickest way I know how, and finally, refactor that code to something I&#39;m happy with. It&#39;s not unlike writing. Create an outline, write your first draft, and then polish it until you&#39;re happy with it.</p>
+
+<p>So where did all this preoccupation with speed and decoupling come from? Nothing in the steps I&#39;ve talked about so far says whether 4.5 minutes for your test suite is too long or if times over one second are too slow.</p>
+
+<p>However, Wikipedia does have a fuller outline of the steps than what I&#39;ve presented in their <a href="http://en.wikipedia.org/wiki/Test-driven_development">Test-driven development</a> article. Let&#39;s take a look (emphasis mine):</p>
+
+<blockquote>
+<ol>
+<li><span>Add a test</span></li>
+<li><span>Run <em>all</em> tests and see if the new one fails</span></li>
+<li><span>Write some code</span></li>
+<li><span>Run <em>all</em> tests</span></li>
+<li><span>Refactor code</span></li>
+</ol>
+</blockquote>
+
+<p>If you want to run all your tests every time you add a new one, you want them to be fast, otherwise they will just slow you down. But the fixation on what is the <em>right</em> amount of time is damaging the discussion. If DHH is fine with waiting 4.5 minutes for his test suite to run, who cares? I think it&#39;s pretty awesome that he has thousands of assertions; most projects I see don&#39;t have anything close to that.</p>
+
+<p>DHH also makes a point in his post <a href="http://david.heinemeierhansson.com/2014/slow-database-test-fallacy.html">Slow database test fallacy</a> about not running all your tests everytime you add a new one, and it is an approach I find reasonable:</p>
+
+<blockquote>
+<p>I still wouldn&#39;t want to wait 80 seconds every time I make a single change to my model, and want to test that. Of course not! Why on earth would you run your entire test harness for every single line change in a particular model? If you have so little confidence in the locality of your changes, the tests are indeed telling you that the system has overly high coupling.</p>
+</blockquote>
+
+<p>Speed is important. If your tests are too slow to be useful, what&#39;s the point of having them? What entails &quot;fast enough&quot; though, is something that is a matter of individual preference. It is also dependent on whether or not you agree with DHH about not running all of your tests all of the time. Faster is better, but I don&#39;t believe in pursuing that at the expense of more important concerns, like writing the code that passes the tests.</p>
+
+<p>Red, green, refactor is, to me, the core of TDD. Decoupled logic in my application is also good idea. If TDD helps me to get there, and decoupling also increases the speed of my tests, those are just bonuses on top of a process I already follow.</p>
+
+<p>So why all the fighting and confusion over TDD? Well, Test Driven Development is just a name. Names are pretty useful things; they help us have discussions about rather complicated topics. If you know what Object Oriented Programming is, and I know what Object Oriented Programming is, we can have a discussion about it without having to stop to define every detail along the way*.</p>
+
+<p>But names can also be harmful. If you &quot;know&quot; what Object Oriented Programming is, and I &quot;know&quot; what Object Oriented Programming is, but our understanding of those two things differs greatly, our discussion will be rather difficult and confusing to follow. We&#39;re both assuming that the other has the same ideas in their head, which makes it hard to communicate effectively.</p>
+
+<p>While reading <a href="http://www.sandimetz.com/">Sandi Metz</a>&#39;s book <a href="http://www.sandimetz.com/poodr/">Practical Objected Oriented Design in Ruby</a>, I noticed something interesting about the way she writes. She doesn&#39;t tell you what things are called until after she&#39;s already shown you how to do it. You don&#39;t have a chance to let your previous knowledge of those concepts get in the way. It&#39;s a great way of explaining ideas that ensures everyone is on the same page.</p>
+
+<p>So what does this have to do with TDD? Well, Test Driven Development is a name that means a lot of things to a lot of people. To me, it means red, green, refactor. Everything else just helps me do that better.</p>
+
+<p>Maybe when we have discussions about TDD, we should be stating what our definition of TDD is. If we are all arguing about different ideas, perhaps we could find some common understanding and begin our discussion there. Our first test might fail, but we can figure out how to make it pass and refactor from there.</p>
+
+<p><small>*Growing a language can be fun. If you haven&#39;t already watched <a href="https://www.youtube.com/watch?v=_ahvzDzKdB0">Growing a Language</a> by Guy Steele, you should! It&#39;s a great talk.</small></p>
+
+<h3>Related Reading</h3>
+
+<ul>
+<li><a href="http://david.heinemeierhansson.com/2014/tdd-is-dead-long-live-testing.html">TDD is dead. Long live testing.</a> - DHH</li>
+<li><a href="http://david.heinemeierhansson.com/2014/test-induced-design-damage.html">Test-induced design damage</a> - DHH</li>
+<li><a href="http://david.heinemeierhansson.com/2014/slow-database-test-fallacy.html">Slow database test fallacy</a> - DHH</li>
+<li><a href="http://blog.8thlight.com/uncle-bob/2014/04/25/MonogamousTDD.html">Monogamous TDD</a> - Uncle Bob</li>
+<li><a href="http://blog.8thlight.com/uncle-bob/2014/05/01/Design-Damage.html">Test Induced Design Damage?</a> - Uncle Bob</li>
+<li><a href="http://blog.8thlight.com/uncle-bob/2014/04/30/When-tdd-does-not-work.html">When TDD doesn&#39;t work.</a> - Uncle Bob</li>
+<li><a href="http://blog.8thlight.com/uncle-bob/2014/05/02/ProfessionalismAndTDD.html">Professionalism and TDD</a> - Uncle Bob</li>
+</ul>
+
+      </div>
+
+      <footer>
+      </footer>
+      <div id="disqus_thread"></div>
+      <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'ericroberts'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+      </script>
+      <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+      <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    </article>
+  </div>
+</div>
+
+  </section>
+
+  <footer>
+    <div class="row">
+    </div>
+  </footer>
+  <script type="text/javascript">
+
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-16269631-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+
+  </script>
+
+  <script type="text/javascript">
+    window.analytics=window.analytics||[],window.analytics.methods=["identify","group","track","page","pageview","alias","ready","on","once","off","trackLink","trackForm","trackClick","trackSubmit"],window.analytics.factory=function(t){return function(){var a=Array.prototype.slice.call(arguments);return a.unshift(t),window.analytics.push(a),window.analytics}};for(var i=0;i<window.analytics.methods.length;i++){var key=window.analytics.methods[i];window.analytics[key]=window.analytics.factory(key)}window.analytics.load=function(t){if(!document.getElementById("analytics-js")){var a=document.createElement("script");a.type="text/javascript",a.id="analytics-js",a.async=!0,a.src=("https:"===document.location.protocol?"https://":"http://")+"cdn.segment.io/analytics.js/v1/"+t+"/analytics.min.js";var n=document.getElementsByTagName("script")[0];n.parentNode.insertBefore(a,n)}},window.analytics.SNIPPET_VERSION="2.0.9",
+    window.analytics.load("ixl7f3o7kf");
+    window.analytics.page();
+  </script>
+</body>
+</html>

@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Hi, I'm Eric Roberts</title>
+  <meta name="viewport" content="width=device-width">
+  <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:200,300,400,600,700,900,200italic,300italic,400italic,600italic,700italic,900italic' rel='stylesheet' type='text/css'>
+  <link href='http://fonts.googleapis.com/css?family=Roboto+Slab:400,300,100' rel='stylesheet' type='text/css'>
+  <link href='http://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="/assets/app-a847808fceed40565a1baba14ea3b020.css">
+</head>
+<body>
+  <section role="main">
+    <header class="home">
+  <div class="row">
+    <div class="columns large-12">
+      <h1 class="wordmark"><a href="/">Hi, I'm Eric Roberts</a></h1>
+    </div>
+  </div>
+</header>
+<div class="byline">
+  <div class="row">
+    <div class="columns large-12">
+      <h2>I'm just a guy who likes hockey and sometimes makes things on the internet. I work at <a href="http://www.boltmade.com">Boltmade</a> and <a href="http://www.20skaters.com">20Skaters.</a></h2>
+    </div>
+  </div>
+</div>
+<section class="posts">
+  <article class="post row">
+    <div class="large-4 columns">
+      <h1><a href="/2015/04/23/what-factories-are-hiding-from-you/">What test factories are hiding from you</a></h1>
+    </div>
+    <div class="large-8 columns post-content">
+      <p>Do you use test factories? You may be missing valuable feedback from your tests
+that could lead to better design.</p>
+
+<p>If you&#39;re like me, you&#39;ve started using factories right about the same time you
+started testing. They are a great way to create a lot of data to use in your
+tests. Without them, you would have to do all of that hard work yourself.
+Recently however, I&#39;ve been rethinking my default &quot;use factories&quot; approach to
+testing.</p>
+
+<h2>Factories make bad design easy</h2>
+
+<p>Test Driven Development (TDD) offers a number of benefits. The self-testing code
+that results from diligent application of TDD allows you to refactor your code
+with confidence. The primary benefit of TDD however, is supposed to be an
+improvement in design <sup><a href="#references">[1]</a></sup>. Yet I see people
+missing out on these design benefits even when they write the tests first and
+spend the time to refactor. I think that one of the problems is the ease of
+using factories to generate large quantities of data. From here on out I will be
+showing what I mean by going through code covered by tests written with
+factories, and discussing what other methods of testing might help us to uncover
+design flaws.</p>
+
+<p>To begin, I will explain the feature that we are trying to build. The project&#39;s
+requirements are to build a feature that returns me the minimum and maximum
+projected revenue for all of my customers for the next year. Each customer has
+a rate assigned to them that indicates a minimum and maximum percentage of this
+year&#39;s revenue we expect to get next year.</p>
+
+<p>For example, if I have a customer who provided me with $1,000,000 in revenue
+last year, and it has been determined that their minimum projected revenue for
+this year is 80% of that, and the maximum projected revenue for this year is
+110%, the minimum projected revenue would work out to be $800,000, and the
+maximum projected revenue would work out to be $1,100,000.</p>
+
+<p>Finally, the actual feature is to calculate the sum of these amounts for
+multiple customers. So if you have one customer projected to have a minimum
+revenue of $800,000 and a maximum of $1,100,000, and another who is projected
+to have a minimum of $600,000 and a maximum of $900,000, the total minimum
+revenue will be $1,400,000 and the total maximum revenue will be $2,000,000. If
+this example seems contrived, it&#39;s because I&#39;ve changed the names of things to
+protect the innocent (Boltmade&#39;s clients), and this is the best I could come up
+with.</p>
+
+<p>All of the code from here on out can be found at the GitHub repository
+<a href="https://github.com/ericroberts/factories">ericroberts/factories</a>. The
+individual refactorings can be found in pull requests. We&#39;ll go through them all
+in this post.</p>
+
+<p>Here&#39;s the test for the feature I&#39;ve just described:</p>
+
+<div class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="lineno"> 1</span> <span class="no">RSpec</span><span class="o">.</span><span class="n">describe</span> <span class="no">Estimator</span> <span class="k">do</span>
+<span class="lineno"> 2</span>   <span class="n">subject</span> <span class="p">{</span> <span class="n">customer</span><span class="o">.</span><span class="n">estimator</span> <span class="p">}</span>
+<span class="lineno"> 3</span>   <span class="n">let</span><span class="p">(</span><span class="ss">:customer</span><span class="p">)</span> <span class="p">{</span> <span class="n">create</span> <span class="ss">:customer</span> <span class="p">}</span>
+<span class="lineno"> 4</span> 
+<span class="lineno"> 5</span>   <span class="n">describe</span> <span class="s2">&quot;#projection&quot;</span> <span class="k">do</span>
+<span class="lineno"> 6</span>     <span class="n">it</span> <span class="s2">&quot;should return the sum of the estimated min and max projections&quot;</span> <span class="k">do</span>
+<span class="lineno"> 7</span>       <span class="n">expect</span><span class="p">(</span><span class="n">subject</span><span class="o">.</span><span class="n">projection</span><span class="p">)</span><span class="o">.</span><span class="n">to</span> <span class="n">eq</span> <span class="o">[</span>
+<span class="lineno"> 8</span>         <span class="n">customer</span><span class="o">.</span><span class="n">revenue</span> <span class="o">*</span> <span class="n">customer</span><span class="o">.</span><span class="n">rate</span><span class="o">.</span><span class="n">min</span><span class="p">,</span>
+<span class="lineno"> 9</span>         <span class="n">customer</span><span class="o">.</span><span class="n">revenue</span> <span class="o">*</span> <span class="n">customer</span><span class="o">.</span><span class="n">rate</span><span class="o">.</span><span class="n">max</span>
+<span class="lineno">10</span>       <span class="o">]</span>
+<span class="lineno">11</span>     <span class="k">end</span>
+<span class="lineno">12</span>   <span class="k">end</span>
+<span class="lineno">13</span> <span class="k">end</span></code></pre></div>
+
+<p>Here are the test factories:</p>
+
+<div class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="lineno"> 1</span> <span class="no">FactoryGirl</span><span class="o">.</span><span class="n">define</span> <span class="k">do</span>
+<span class="lineno"> 2</span>   <span class="n">factory</span> <span class="ss">:estimator</span> <span class="k">do</span>
+<span class="lineno"> 3</span>   <span class="k">end</span>
+<span class="lineno"> 4</span> 
+<span class="lineno"> 5</span>   <span class="n">factory</span> <span class="ss">:customer</span> <span class="k">do</span>
+<span class="lineno"> 6</span>     <span class="n">association</span> <span class="ss">:rate</span>
+<span class="lineno"> 7</span>     <span class="n">association</span> <span class="ss">:estimator</span>
+<span class="lineno"> 8</span>     <span class="n">revenue</span> <span class="mi">100</span>
+<span class="lineno"> 9</span>   <span class="k">end</span>
+<span class="lineno">10</span> 
+<span class="lineno">11</span>   <span class="n">factory</span> <span class="ss">:rate</span> <span class="k">do</span>
+<span class="lineno">12</span>     <span class="n">min</span> <span class="mi">80</span>
+<span class="lineno">13</span>     <span class="n">max</span> <span class="mi">90</span>
+<span class="lineno">14</span>   <span class="k">end</span>
+<span class="lineno">15</span> <span class="k">end</span></code></pre></div>
+
+<p>And finally, here&#39;s the code that actually implements the feature:</p>
+
+<div class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="lineno"> 1</span> <span class="k">class</span> <span class="nc">Estimator</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+<span class="lineno"> 2</span>   <span class="n">has_many</span> <span class="ss">:customers</span>
+<span class="lineno"> 3</span> 
+<span class="lineno"> 4</span>   <span class="k">def</span> <span class="nf">projection</span>
+<span class="lineno"> 5</span>     <span class="n">customers</span><span class="o">.</span><span class="n">inject</span><span class="p">(</span><span class="o">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="o">]</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="p">(</span><span class="n">min</span><span class="p">,</span> <span class="n">max</span><span class="p">),</span> <span class="n">customer</span><span class="o">|</span>
+<span class="lineno"> 6</span>       <span class="n">min</span> <span class="o">+=</span> <span class="n">customer</span><span class="o">.</span><span class="n">revenue</span> <span class="o">*</span> <span class="n">customer</span><span class="o">.</span><span class="n">rate</span><span class="o">.</span><span class="n">min</span>
+<span class="lineno"> 7</span>       <span class="n">max</span> <span class="o">+=</span> <span class="n">customer</span><span class="o">.</span><span class="n">revenue</span> <span class="o">*</span> <span class="n">customer</span><span class="o">.</span><span class="n">rate</span><span class="o">.</span><span class="n">max</span>
+<span class="lineno"> 8</span>       <span class="o">[</span><span class="n">min</span><span class="p">,</span> <span class="n">max</span><span class="o">]</span>
+<span class="lineno"> 9</span>     <span class="k">end</span>
+<span class="lineno">10</span>   <span class="k">end</span>
+<span class="lineno">11</span> <span class="k">end</span>
+<span class="lineno">12</span> 
+<span class="lineno">13</span> <span class="k">class</span> <span class="nc">Customer</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+<span class="lineno">14</span>   <span class="n">belongs_to</span> <span class="ss">:rate</span>
+<span class="lineno">15</span>   <span class="n">belongs_to</span> <span class="ss">:estimator</span>
+<span class="lineno">16</span> 
+<span class="lineno">17</span>   <span class="c1"># revenue method added by ActiveRecord</span>
+<span class="lineno">18</span> <span class="k">end</span>
+<span class="lineno">19</span> 
+<span class="lineno">20</span> <span class="k">class</span> <span class="nc">Rate</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+<span class="lineno">21</span>   <span class="k">def</span> <span class="nf">min</span>
+<span class="lineno">22</span>     <span class="nb">self</span><span class="o">[</span><span class="ss">:min</span><span class="o">]</span> <span class="o">/</span> <span class="mi">100</span><span class="o">.</span><span class="n">to_f</span>
+<span class="lineno">23</span>   <span class="k">end</span>
+<span class="lineno">24</span> 
+<span class="lineno">25</span>   <span class="k">def</span> <span class="nf">max</span>
+<span class="lineno">26</span>     <span class="nb">self</span><span class="o">[</span><span class="ss">:max</span><span class="o">]</span> <span class="o">/</span> <span class="mi">100</span><span class="o">.</span><span class="n">to_f</span>
+<span class="lineno">27</span>   <span class="k">end</span>
+<span class="lineno">28</span> <span class="k">end</span></code></pre></div>
+
+<p>Doesn&#39;t look too bad, does it? Let&#39;s see what we can discover by refusing to use
+factories.</p>
+
+<h2>Without factories</h2>
+
+<p>We&#39;re going to write this without using factories at all. This means we will
+have to provide all the data ourselves. I&#39;m going to choose to do this with
+stubs. Here&#39;s what the same test looks like when we stub all of our data:</p>
+
+<div class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="lineno"> 1</span> <span class="no">RSpec</span><span class="o">.</span><span class="n">describe</span> <span class="no">Estimator</span> <span class="k">do</span>
+<span class="lineno"> 2</span>   <span class="n">subject</span> <span class="p">{</span> <span class="no">Estimator</span><span class="o">.</span><span class="n">new</span> <span class="p">}</span>
+<span class="lineno"> 3</span> 
+<span class="lineno"> 4</span>   <span class="n">describe</span> <span class="s2">&quot;#projection&quot;</span> <span class="k">do</span>
+<span class="lineno"> 5</span>     <span class="n">let</span><span class="p">(</span><span class="ss">:customer</span><span class="p">)</span> <span class="p">{</span> <span class="n">double</span> <span class="p">}</span>
+<span class="lineno"> 6</span>     <span class="n">let</span><span class="p">(</span><span class="ss">:rate</span><span class="p">)</span> <span class="p">{</span> <span class="n">double</span> <span class="p">}</span>
+<span class="lineno"> 7</span> 
+<span class="lineno"> 8</span>     <span class="n">before</span> <span class="k">do</span>
+<span class="lineno"> 9</span>       <span class="n">allow</span><span class="p">(</span><span class="n">subject</span><span class="p">)</span><span class="o">.</span><span class="n">to</span> <span class="n">receive</span><span class="p">(</span><span class="ss">:customers</span><span class="p">)</span><span class="o">.</span><span class="n">and_return</span><span class="p">(</span><span class="o">[</span><span class="n">customer</span><span class="o">]</span><span class="p">)</span>
+<span class="lineno">10</span>       <span class="n">allow</span><span class="p">(</span><span class="n">customer</span><span class="p">)</span><span class="o">.</span><span class="n">to</span> <span class="n">receive</span><span class="p">(</span><span class="ss">:revenue</span><span class="p">)</span><span class="o">.</span><span class="n">and_return</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+<span class="lineno">11</span>       <span class="n">allow</span><span class="p">(</span><span class="n">customer</span><span class="p">)</span><span class="o">.</span><span class="n">to</span> <span class="n">receive</span><span class="p">(</span><span class="ss">:rate</span><span class="p">)</span><span class="o">.</span><span class="n">and_return</span><span class="p">(</span><span class="n">rate</span><span class="p">)</span>
+<span class="lineno">12</span>       <span class="n">allow</span><span class="p">(</span><span class="n">rate</span><span class="p">)</span><span class="o">.</span><span class="n">to</span> <span class="n">receive</span><span class="p">(</span><span class="ss">:min</span><span class="p">)</span><span class="o">.</span><span class="n">and_return</span><span class="p">(</span><span class="mi">80</span><span class="p">)</span>
+<span class="lineno">13</span>       <span class="n">allow</span><span class="p">(</span><span class="n">rate</span><span class="p">)</span><span class="o">.</span><span class="n">to</span> <span class="n">receive</span><span class="p">(</span><span class="ss">:max</span><span class="p">)</span><span class="o">.</span><span class="n">and_return</span><span class="p">(</span><span class="mi">90</span><span class="p">)</span>
+<span class="lineno">14</span>     <span class="k">end</span>
+<span class="lineno">15</span> 
+<span class="lineno">16</span>     <span class="n">it</span> <span class="s2">&quot;should return the sum of the estimated min and max projections&quot;</span> <span class="k">do</span>
+<span class="lineno">17</span>       <span class="n">expect</span><span class="p">(</span><span class="n">subject</span><span class="o">.</span><span class="n">projection</span><span class="p">)</span><span class="o">.</span><span class="n">to</span> <span class="n">eq</span> <span class="o">[</span>
+<span class="lineno">18</span>         <span class="n">customer</span><span class="o">.</span><span class="n">revenue</span> <span class="o">*</span> <span class="n">customer</span><span class="o">.</span><span class="n">rate</span><span class="o">.</span><span class="n">min</span><span class="p">,</span>
+<span class="lineno">19</span>         <span class="n">customer</span><span class="o">.</span><span class="n">revenue</span> <span class="o">*</span> <span class="n">customer</span><span class="o">.</span><span class="n">rate</span><span class="o">.</span><span class="n">max</span>
+<span class="lineno">20</span>       <span class="o">]</span>
+<span class="lineno">21</span>     <span class="k">end</span>
+<span class="lineno">22</span>   <span class="k">end</span>
+<span class="lineno">23</span> <span class="k">end</span></code></pre></div>
+
+<p>Stubbing all of those methods is painful. And worse, if any of the methods being
+called change, we&#39;ll have to change the stubs. That&#39;s not very good. And yet, I
+will argue that this pain is a good thing. This pain is alerting us to the
+presence of bad design.</p>
+
+<p>If we look at those tests, what is that we are stubbing? First we have to stub
+the customers method to return our own Customer double. Then we have to stub not
+one but two methods on customer to return specific values.</p>
+
+<p>So what is this test telling us? I would argue that this test is telling us that
+Estimator knows too much about Customer. This is where we should step back and
+figure out exactly what it is we want from Customer. Why does Estimator need to
+know the customer&#39;s revenue and the customer&#39;s rate? What is it we are doing
+here?</p>
+
+<p>Our original feature description wanted us to sum the customer&#39;s projected
+revenue. We are doing this, but we implemented it so that all the work is in
+Estimator. Estimator really just cares about what the customer&#39;s projected
+revenue is, and yet we have implemented it so that Estimator knows how to
+calculate a Customer&#39;s projected revenue. That feels like the responsibility of
+a Customer, so let&#39;s make it one.</p>
+
+<p>Here&#39;s the test for the new method on Customer:</p>
+
+<div class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="lineno"> 1</span> <span class="no">RSpec</span><span class="o">.</span><span class="n">describe</span> <span class="no">Customer</span> <span class="k">do</span>
+<span class="lineno"> 2</span>   <span class="n">subject</span> <span class="p">{</span> <span class="no">Customer</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="ss">revenue</span><span class="p">:</span> <span class="mi">100</span><span class="p">)</span> <span class="p">}</span>
+<span class="lineno"> 3</span>   <span class="n">let</span><span class="p">(</span><span class="ss">:rate</span><span class="p">)</span> <span class="p">{</span> <span class="n">double</span> <span class="p">}</span>
+<span class="lineno"> 4</span>   <span class="n">let</span><span class="p">(</span><span class="ss">:min</span><span class="p">)</span> <span class="p">{</span> <span class="mi">80</span> <span class="p">}</span>
+<span class="lineno"> 5</span>   <span class="n">let</span><span class="p">(</span><span class="ss">:max</span><span class="p">)</span> <span class="p">{</span> <span class="mi">90</span> <span class="p">}</span>
+<span class="lineno"> 6</span> 
+<span class="lineno"> 7</span>   <span class="n">before</span> <span class="k">do</span>
+<span class="lineno"> 8</span>     <span class="n">allow</span><span class="p">(</span><span class="n">subject</span><span class="p">)</span><span class="o">.</span><span class="n">to</span> <span class="n">receive</span><span class="p">(</span><span class="ss">:rate</span><span class="p">)</span><span class="o">.</span><span class="n">and_return</span><span class="p">(</span><span class="n">rate</span><span class="p">)</span>
+<span class="lineno"> 9</span>     <span class="n">allow</span><span class="p">(</span><span class="n">rate</span><span class="p">)</span><span class="o">.</span><span class="n">to</span> <span class="n">receive</span><span class="p">(</span><span class="ss">:min</span><span class="p">)</span><span class="o">.</span><span class="n">and_return</span><span class="p">(</span><span class="n">min</span><span class="p">)</span>
+<span class="lineno">10</span>     <span class="n">allow</span><span class="p">(</span><span class="n">rate</span><span class="p">)</span><span class="o">.</span><span class="n">to</span> <span class="n">receive</span><span class="p">(</span><span class="ss">:max</span><span class="p">)</span><span class="o">.</span><span class="n">and_return</span><span class="p">(</span><span class="n">max</span><span class="p">)</span>
+<span class="lineno">11</span>   <span class="k">end</span>
+<span class="lineno">12</span> 
+<span class="lineno">13</span>   <span class="n">it</span> <span class="s2">&quot;should return the min and max projection&quot;</span> <span class="k">do</span>
+<span class="lineno">14</span>     <span class="n">expect</span><span class="p">(</span><span class="n">subject</span><span class="o">.</span><span class="n">projection</span><span class="p">)</span><span class="o">.</span><span class="n">to</span> <span class="n">eq</span> <span class="o">[</span>
+<span class="lineno">15</span>       <span class="n">subject</span><span class="o">.</span><span class="n">revenue</span> <span class="o">*</span> <span class="n">rate</span><span class="o">.</span><span class="n">min</span><span class="p">,</span>
+<span class="lineno">16</span>       <span class="n">subject</span><span class="o">.</span><span class="n">revenue</span> <span class="o">*</span> <span class="n">rate</span><span class="o">.</span><span class="n">max</span>
+<span class="lineno">17</span>     <span class="o">]</span>
+<span class="lineno">18</span>   <span class="k">end</span>
+<span class="lineno">19</span> <span class="k">end</span></code></pre></div>
+
+<p>Then we can implement this method on Customer like so:</p>
+
+<div class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="lineno"> 1</span> <span class="k">class</span> <span class="nc">Customer</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+<span class="lineno"> 2</span>   <span class="n">belongs_to</span> <span class="ss">:rate</span>
+<span class="lineno"> 3</span>   <span class="n">belongs_to</span> <span class="ss">:estimator</span>
+<span class="lineno"> 4</span> 
+<span class="lineno"> 5</span>   <span class="k">def</span> <span class="nf">projection</span>
+<span class="lineno"> 6</span>     <span class="o">[</span>
+<span class="lineno"> 7</span>       <span class="n">revenue</span> <span class="o">*</span> <span class="n">rate</span><span class="o">.</span><span class="n">min</span><span class="p">,</span>
+<span class="lineno"> 8</span>       <span class="n">revenue</span> <span class="o">*</span> <span class="n">rate</span><span class="o">.</span><span class="n">max</span>
+<span class="lineno"> 9</span>     <span class="o">]</span>
+<span class="lineno">10</span>   <span class="k">end</span>
+<span class="lineno">11</span> <span class="k">end</span></code></pre></div>
+
+<p>Now we can revisit our Estimator tests and update them to look like this:</p>
+
+<div class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="lineno"> 1</span> <span class="no">RSpec</span><span class="o">.</span><span class="n">describe</span> <span class="no">Estimator</span> <span class="k">do</span>
+<span class="lineno"> 2</span>   <span class="n">subject</span> <span class="p">{</span> <span class="no">Estimator</span><span class="o">.</span><span class="n">new</span> <span class="p">}</span>
+<span class="lineno"> 3</span> 
+<span class="lineno"> 4</span>   <span class="n">describe</span> <span class="s2">&quot;#projection&quot;</span> <span class="k">do</span>
+<span class="lineno"> 5</span>     <span class="n">let</span><span class="p">(</span><span class="ss">:customer</span><span class="p">)</span> <span class="p">{</span> <span class="n">double</span> <span class="p">}</span>
+<span class="lineno"> 6</span>     <span class="n">let</span><span class="p">(</span><span class="ss">:projection</span><span class="p">)</span> <span class="p">{</span> <span class="o">[</span><span class="mi">80</span><span class="p">,</span><span class="mi">90</span><span class="o">]</span> <span class="p">}</span>
+<span class="lineno"> 7</span> 
+<span class="lineno"> 8</span>     <span class="n">before</span> <span class="k">do</span>
+<span class="lineno"> 9</span>       <span class="n">allow</span><span class="p">(</span><span class="n">subject</span><span class="p">)</span><span class="o">.</span><span class="n">to</span> <span class="n">receive</span><span class="p">(</span><span class="ss">:customers</span><span class="p">)</span><span class="o">.</span><span class="n">and_return</span><span class="p">(</span><span class="o">[</span><span class="n">customer</span><span class="o">]</span><span class="p">)</span>
+<span class="lineno">10</span>       <span class="n">allow</span><span class="p">(</span><span class="n">customer</span><span class="p">)</span><span class="o">.</span><span class="n">to</span> <span class="n">receive</span><span class="p">(</span><span class="ss">:projection</span><span class="p">)</span><span class="o">.</span><span class="n">and_return</span><span class="p">(</span><span class="n">projection</span><span class="p">)</span>
+<span class="lineno">11</span>     <span class="k">end</span>
+<span class="lineno">12</span> 
+<span class="lineno">13</span>     <span class="n">it</span> <span class="s2">&quot;should return the sum of the estimated min and max projections&quot;</span> <span class="k">do</span>
+<span class="lineno">14</span>       <span class="n">expect</span><span class="p">(</span><span class="n">subject</span><span class="o">.</span><span class="n">projection</span><span class="p">)</span><span class="o">.</span><span class="n">to</span> <span class="n">eq</span> <span class="o">[</span>
+<span class="lineno">15</span>         <span class="n">projection</span><span class="o">.</span><span class="n">min</span><span class="p">,</span>
+<span class="lineno">16</span>         <span class="n">projection</span><span class="o">.</span><span class="n">max</span>
+<span class="lineno">17</span>       <span class="o">]</span>
+<span class="lineno">18</span>     <span class="k">end</span>
+<span class="lineno">19</span>   <span class="k">end</span>
+<span class="lineno">20</span> <span class="k">end</span></code></pre></div>
+
+<p>And the updated Estimator code:</p>
+
+<div class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="lineno"> 1</span> <span class="k">class</span> <span class="nc">Estimator</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+<span class="lineno"> 2</span>   <span class="n">has_many</span> <span class="ss">:customers</span>
+<span class="lineno"> 3</span> 
+<span class="lineno"> 4</span>   <span class="k">def</span> <span class="nf">projection</span>
+<span class="lineno"> 5</span>     <span class="n">customers</span><span class="o">.</span><span class="n">inject</span><span class="p">(</span><span class="o">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="o">]</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="p">(</span><span class="n">min</span><span class="p">,</span> <span class="n">max</span><span class="p">),</span> <span class="n">customer</span><span class="o">|</span>
+<span class="lineno"> 6</span>       <span class="n">min</span> <span class="o">+=</span> <span class="n">customer</span><span class="o">.</span><span class="n">projection</span><span class="o">.</span><span class="n">min</span>
+<span class="lineno"> 7</span>       <span class="n">max</span> <span class="o">+=</span> <span class="n">customer</span><span class="o">.</span><span class="n">projection</span><span class="o">.</span><span class="n">min</span>
+<span class="lineno"> 8</span>       <span class="o">[</span><span class="n">min</span><span class="p">,</span> <span class="n">max</span><span class="o">]</span>
+<span class="lineno"> 9</span>     <span class="k">end</span>
+<span class="lineno">10</span>   <span class="k">end</span>
+<span class="lineno">11</span> <span class="k">end</span></code></pre></div>
+
+<p>I think we&#39;ve definitely made an improvement here. Estimator know only knows
+one method on Customer. But is there more we could do? Let&#39;s leave
+Estimator for a second and go back to our current tests for Customer.</p>
+
+<div class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="lineno"> 1</span> <span class="no">RSpec</span><span class="o">.</span><span class="n">describe</span> <span class="no">Customer</span> <span class="k">do</span>
+<span class="lineno"> 2</span>   <span class="n">subject</span> <span class="p">{</span> <span class="no">Customer</span><span class="o">.</span><span class="n">new</span> <span class="p">}</span>
+<span class="lineno"> 3</span> 
+<span class="lineno"> 4</span>   <span class="n">describe</span> <span class="s2">&quot;#projection&quot;</span> <span class="k">do</span>
+<span class="lineno"> 5</span>     <span class="n">let</span><span class="p">(</span><span class="ss">:rate</span><span class="p">)</span> <span class="p">{</span> <span class="n">double</span> <span class="p">}</span>
+<span class="lineno"> 6</span> 
+<span class="lineno"> 7</span>     <span class="n">before</span> <span class="k">do</span>
+<span class="lineno"> 8</span>       <span class="n">allow</span><span class="p">(</span><span class="n">subject</span><span class="p">)</span><span class="o">.</span><span class="n">to</span> <span class="n">receive</span><span class="p">(</span><span class="ss">:rate</span><span class="p">)</span><span class="o">.</span><span class="n">and_return</span><span class="p">(</span><span class="n">rate</span><span class="p">)</span>
+<span class="lineno"> 9</span>       <span class="n">allow</span><span class="p">(</span><span class="n">rate</span><span class="p">)</span><span class="o">.</span><span class="n">to</span> <span class="n">receive</span><span class="p">(</span><span class="ss">:min</span><span class="p">)</span><span class="o">.</span><span class="n">and_return</span><span class="p">(</span><span class="n">min</span><span class="p">)</span>
+<span class="lineno">10</span>       <span class="n">allow</span><span class="p">(</span><span class="n">rate</span><span class="p">)</span><span class="o">.</span><span class="n">to</span> <span class="n">receive</span><span class="p">(</span><span class="ss">:max</span><span class="p">)</span><span class="o">.</span><span class="n">and_return</span><span class="p">(</span><span class="n">max</span><span class="p">)</span>
+<span class="lineno">11</span>     <span class="k">end</span>
+<span class="lineno">12</span> 
+<span class="lineno">13</span>     <span class="n">it</span> <span class="s2">&quot;should return the min and max projection&quot;</span> <span class="k">do</span>
+<span class="lineno">14</span>       <span class="n">expect</span><span class="p">(</span><span class="n">subject</span><span class="o">.</span><span class="n">projection</span><span class="p">)</span><span class="o">.</span><span class="n">to</span> <span class="n">eq</span> <span class="o">[</span>
+<span class="lineno">15</span>         <span class="n">customer</span><span class="o">.</span><span class="n">revenue</span> <span class="o">*</span> <span class="n">rate</span><span class="o">.</span><span class="n">min</span><span class="p">,</span>
+<span class="lineno">16</span>         <span class="n">customer</span><span class="o">.</span><span class="n">revenue</span> <span class="o">*</span> <span class="n">rate</span><span class="o">.</span><span class="n">max</span>
+<span class="lineno">17</span>       <span class="o">]</span>
+<span class="lineno">18</span>     <span class="k">end</span>
+<span class="lineno">19</span>   <span class="k">end</span>
+<span class="lineno">20</span> <span class="k">end</span></code></pre></div>
+
+<p>To me, this looks like Customer knows too much about Rate. Why does Customer
+care that Rate has a min and a max? What is it that we actually want to get
+from customer? When you really think about it, we want to multiply a customer&#39;s
+revenue by a customer&#39;s rate. The fact that Rate happens to be represented with
+a minimum and maximum value shouldn&#39;t matter to us. This is the code we want:</p>
+
+<div class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="lineno">1</span> <span class="k">def</span> <span class="nf">projection</span>
+<span class="lineno">2</span>   <span class="n">rate</span> <span class="o">*</span> <span class="n">revenue</span>
+<span class="lineno">3</span> <span class="k">end</span></code></pre></div>
+
+<p>So just how do we go about doing this? It&#39;s important to remember here that <code>*</code>
+is just another method. <code>1 * 2</code> is just syntax that calls the method <code>*</code> on <code>1</code>
+and passes <code>2</code> as the argument. There is special syntax that allows us to
+leave off the <code>.</code> which makes it look different. If we imagined that <code>*</code> was
+really called <code>times</code>, it would look like this: <code>1.times(2)</code>.</p>
+
+<p>With that knowledge, we can go ahead and implement the <code>*</code> method on Rate.
+Here&#39;s our test:</p>
+
+<div class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="lineno"> 1</span> <span class="no">RSpec</span><span class="o">.</span><span class="n">describe</span> <span class="no">Rate</span> <span class="k">do</span>
+<span class="lineno"> 2</span>   <span class="n">subject</span> <span class="p">{</span> <span class="no">Rate</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="ss">min</span><span class="p">:</span> <span class="n">min</span><span class="p">,</span> <span class="ss">max</span><span class="p">:</span> <span class="n">max</span><span class="p">)</span> <span class="p">}</span>
+<span class="lineno"> 3</span>   <span class="n">let</span><span class="p">(</span><span class="ss">:min</span><span class="p">)</span> <span class="p">{</span> <span class="mi">80</span> <span class="p">}</span>
+<span class="lineno"> 4</span>   <span class="n">let</span><span class="p">(</span><span class="ss">:max</span><span class="p">)</span> <span class="p">{</span> <span class="mi">90</span> <span class="p">}</span>
+<span class="lineno"> 5</span> 
+<span class="lineno"> 6</span>   <span class="n">describe</span> <span class="s2">&quot;#*&quot;</span> <span class="k">do</span>
+<span class="lineno"> 7</span>     <span class="n">let</span><span class="p">(</span><span class="ss">:multiplier</span><span class="p">)</span> <span class="p">{</span> <span class="mi">100</span> <span class="p">}</span>
+<span class="lineno"> 8</span> 
+<span class="lineno"> 9</span>     <span class="n">it</span> <span class="s2">&quot;should return the two possible rates&quot;</span> <span class="k">do</span>
+<span class="lineno">10</span>       <span class="n">expect</span><span class="p">(</span><span class="n">subject</span> <span class="o">*</span> <span class="n">multiplier</span><span class="p">)</span><span class="o">.</span><span class="n">to</span> <span class="n">eq</span> <span class="o">[</span>
+<span class="lineno">11</span>         <span class="n">min</span> <span class="o">*</span> <span class="n">multiplier</span><span class="p">,</span>
+<span class="lineno">12</span>         <span class="n">max</span> <span class="o">*</span> <span class="n">multiplier</span>
+<span class="lineno">13</span>       <span class="o">]</span>
+<span class="lineno">14</span>     <span class="k">end</span>
+<span class="lineno">15</span>   <span class="k">end</span>
+<span class="lineno">16</span> <span class="k">end</span></code></pre></div>
+
+<p>And the implementation:</p>
+
+<div class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="lineno"> 1</span> <span class="k">class</span> <span class="nc">Rate</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+<span class="lineno"> 2</span>   <span class="k">def</span> <span class="nf">min</span>
+<span class="lineno"> 3</span>     <span class="nb">self</span><span class="o">[</span><span class="ss">:min</span><span class="o">]</span> <span class="o">/</span> <span class="mi">100</span><span class="o">.</span><span class="n">to_f</span>
+<span class="lineno"> 4</span>   <span class="k">end</span>
+<span class="lineno"> 5</span> 
+<span class="lineno"> 6</span>   <span class="k">def</span> <span class="nf">max</span>
+<span class="lineno"> 7</span>     <span class="nb">self</span><span class="o">[</span><span class="ss">:max</span><span class="o">]</span> <span class="o">/</span> <span class="mi">100</span><span class="o">.</span><span class="n">to_f</span>
+<span class="lineno"> 8</span>   <span class="k">end</span>
+<span class="lineno"> 9</span> 
+<span class="lineno">10</span>   <span class="k">def</span> <span class="nf">*</span> <span class="n">other</span>
+<span class="lineno">11</span>     <span class="o">[</span>
+<span class="lineno">12</span>       <span class="n">min</span> <span class="o">*</span> <span class="n">other</span><span class="p">,</span>
+<span class="lineno">13</span>       <span class="n">max</span> <span class="o">*</span> <span class="n">other</span>
+<span class="lineno">14</span>     <span class="o">]</span>
+<span class="lineno">15</span>   <span class="k">end</span>
+<span class="lineno">16</span> <span class="k">end</span></code></pre></div>
+
+<p>Now we can multiply a Rate by some other number and get an Array back that
+contains the minimum and maximum values as applied to that other number.</p>
+
+<p>This now simplifies our code in Customer:</p>
+
+<div class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="lineno">1</span> <span class="k">class</span> <span class="nc">Customer</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+<span class="lineno">2</span>   <span class="n">belongs_to</span> <span class="ss">:rate</span>
+<span class="lineno">3</span>   <span class="n">belongs_to</span> <span class="ss">:estimator</span>
+<span class="lineno">4</span> 
+<span class="lineno">5</span>   <span class="k">def</span> <span class="nf">projection</span>
+<span class="lineno">6</span>     <span class="n">rate</span> <span class="o">*</span> <span class="n">revenue</span>
+<span class="lineno">7</span>   <span class="k">end</span>
+<span class="lineno">8</span> <span class="k">end</span></code></pre></div>
+
+<p>But what should we test now? One of the points of this was for Customer to know
+less about Rate. Right now however, our tests still know about Rate so we can
+check the return values. But maybe we shouldn&#39;t be testing the return values at
+all? Rate already has a test that asserts what happens when you call the <code>*</code>
+method on it. Therefore, all we want to test here is that we called that method
+properly, and with the correct arguments. Now our Customer test looks like this:</p>
+
+<div class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="lineno"> 1</span> <span class="no">RSpec</span><span class="o">.</span><span class="n">describe</span> <span class="no">Customer</span> <span class="k">do</span>
+<span class="lineno"> 2</span>   <span class="n">subject</span> <span class="p">{</span> <span class="no">Customer</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="ss">revenue</span><span class="p">:</span> <span class="n">revenue</span><span class="p">)</span> <span class="p">}</span>
+<span class="lineno"> 3</span>   <span class="n">let</span><span class="p">(</span><span class="ss">:revenue</span><span class="p">)</span> <span class="p">{</span> <span class="mi">100</span> <span class="p">}</span>
+<span class="lineno"> 4</span> 
+<span class="lineno"> 5</span>   <span class="n">describe</span> <span class="s2">&quot;#projection&quot;</span> <span class="k">do</span>
+<span class="lineno"> 6</span>     <span class="n">let</span><span class="p">(</span><span class="ss">:rate</span><span class="p">)</span> <span class="p">{</span> <span class="n">double</span> <span class="p">}</span>
+<span class="lineno"> 7</span> 
+<span class="lineno"> 8</span>     <span class="n">before</span> <span class="k">do</span>
+<span class="lineno"> 9</span>       <span class="n">allow</span><span class="p">(</span><span class="n">subject</span><span class="p">)</span><span class="o">.</span><span class="n">to</span> <span class="n">receive</span><span class="p">(</span><span class="ss">:rate</span><span class="p">)</span><span class="o">.</span><span class="n">and_return</span><span class="p">(</span><span class="n">rate</span><span class="p">)</span>
+<span class="lineno">10</span>     <span class="k">end</span>
+<span class="lineno">11</span> 
+<span class="lineno">12</span>      <span class="n">it</span> <span class="s2">&quot;should send the * message to rate&quot;</span> <span class="k">do</span>
+<span class="lineno">13</span>        <span class="n">expect</span><span class="p">(</span><span class="n">rate</span><span class="p">)</span><span class="o">.</span><span class="n">to</span> <span class="n">receive</span><span class="p">(</span><span class="ss">:*</span><span class="p">)</span><span class="o">.</span><span class="n">with</span><span class="p">(</span><span class="n">revenue</span><span class="p">)</span>
+<span class="lineno">14</span>        <span class="n">subject</span><span class="o">.</span><span class="n">projection</span>
+<span class="lineno">15</span>      <span class="k">end</span>
+<span class="lineno">16</span>   <span class="k">end</span>
+<span class="lineno">17</span> <span class="k">end</span></code></pre></div>
+
+<p>Now Customer looks simpler, and all it knows is that Rate has a <code>*</code> method. But
+what happens when we go back out to Estimator? What does it know still?</p>
+
+<div class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="lineno"> 1</span> <span class="k">class</span> <span class="nc">Estimator</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+<span class="lineno"> 2</span>   <span class="n">has_many</span> <span class="ss">:customers</span>
+<span class="lineno"> 3</span> 
+<span class="lineno"> 4</span>   <span class="k">def</span> <span class="nf">projection</span>
+<span class="lineno"> 5</span>     <span class="n">customers</span><span class="o">.</span><span class="n">inject</span><span class="p">(</span><span class="o">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="o">]</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="p">(</span><span class="n">min</span><span class="p">,</span> <span class="n">max</span><span class="p">),</span> <span class="n">customer</span><span class="o">|</span>
+<span class="lineno"> 6</span>       <span class="n">min</span> <span class="o">+=</span> <span class="n">customer</span><span class="o">.</span><span class="n">projection</span><span class="o">.</span><span class="n">min</span>
+<span class="lineno"> 7</span>       <span class="n">max</span> <span class="o">+=</span> <span class="n">customer</span><span class="o">.</span><span class="n">projection</span><span class="o">.</span><span class="n">max</span>
+<span class="lineno"> 8</span>       <span class="o">[</span><span class="n">min</span><span class="p">,</span> <span class="n">max</span><span class="o">]</span>
+<span class="lineno"> 9</span>     <span class="k">end</span>
+<span class="lineno">10</span>   <span class="k">end</span>
+<span class="lineno">11</span> <span class="k">end</span></code></pre></div>
+
+<p>Estimator still knows what it is expection from the customer&#39;s projection
+method. Conceptually all we want to do is get the sum of the customer&#39;s
+projections. It would be nice if we could do something more like this:</p>
+
+<div class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="lineno">1</span> <span class="k">class</span> <span class="nc">Estimator</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+<span class="lineno">2</span>   <span class="n">has_many</span> <span class="ss">:customers</span>
+<span class="lineno">3</span> 
+<span class="lineno">4</span>   <span class="k">def</span> <span class="nf">projection</span>
+<span class="lineno">5</span>     <span class="n">customers</span><span class="o">.</span><span class="n">inject</span><span class="p">(</span><span class="o">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="o">]</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">sum</span><span class="p">,</span> <span class="n">customer</span><span class="o">|</span>
+<span class="lineno">6</span>       <span class="n">sum</span> <span class="o">+</span> <span class="n">customer</span><span class="o">.</span><span class="n">projection</span>
+<span class="lineno">7</span>     <span class="k">end</span>
+<span class="lineno">8</span>   <span class="k">end</span>
+<span class="lineno">9</span> <span class="k">end</span></code></pre></div>
+
+<p>So, let&#39;s make our code work like that! First, we&#39;re going to need an object
+that takes a min and a max itself and knows how to add other mins and maxes to
+it. For lack of a better name, we&#39;ll call it MinMax. Here&#39;s the test:</p>
+
+<div class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="lineno"> 1</span> <span class="no">RSpec</span><span class="o">.</span><span class="n">describe</span> <span class="no">MinMax</span> <span class="k">do</span>
+<span class="lineno"> 2</span>   <span class="n">subject</span> <span class="p">{</span> <span class="no">MinMax</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">min</span><span class="p">,</span> <span class="n">max</span><span class="p">)</span> <span class="p">}</span>
+<span class="lineno"> 3</span>   <span class="n">let</span><span class="p">(</span><span class="ss">:min</span><span class="p">)</span> <span class="p">{</span> <span class="mi">80</span> <span class="p">}</span>
+<span class="lineno"> 4</span>   <span class="n">let</span><span class="p">(</span><span class="ss">:max</span><span class="p">)</span> <span class="p">{</span> <span class="mi">90</span> <span class="p">}</span>
+<span class="lineno"> 5</span> 
+<span class="lineno"> 6</span>   <span class="n">describe</span> <span class="s2">&quot;#+&quot;</span> <span class="k">do</span>
+<span class="lineno"> 7</span>     <span class="n">let</span><span class="p">(</span><span class="ss">:other</span><span class="p">)</span> <span class="p">{</span> <span class="o">[</span><span class="n">min</span><span class="p">,</span> <span class="n">max</span><span class="o">]</span> <span class="p">}</span>
+<span class="lineno"> 8</span> 
+<span class="lineno"> 9</span>     <span class="n">it</span> <span class="s2">&quot;should return a new object that responds to min and max&quot;</span> <span class="k">do</span>
+<span class="lineno">10</span>       <span class="n">new_min_max</span> <span class="o">=</span> <span class="n">subject</span> <span class="o">+</span> <span class="n">other</span>
+<span class="lineno">11</span>       <span class="n">expect</span><span class="p">(</span><span class="n">new_min_max</span><span class="o">.</span><span class="n">min</span><span class="p">)</span><span class="o">.</span><span class="n">to</span> <span class="n">eq</span> <span class="n">subject</span><span class="o">.</span><span class="n">min</span> <span class="o">+</span> <span class="n">other</span><span class="o">.</span><span class="n">min</span>
+<span class="lineno">12</span>       <span class="n">expect</span><span class="p">(</span><span class="n">new_min_max</span><span class="o">.</span><span class="n">max</span><span class="p">)</span><span class="o">.</span><span class="n">to</span> <span class="n">eq</span> <span class="n">subject</span><span class="o">.</span><span class="n">max</span> <span class="o">+</span> <span class="n">other</span><span class="o">.</span><span class="n">max</span>
+<span class="lineno">13</span>     <span class="k">end</span>
+<span class="lineno">14</span>   <span class="k">end</span>
+<span class="lineno">15</span> <span class="k">end</span></code></pre></div>
+
+<p>And here&#39;s the implementation:</p>
+
+<div class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="lineno"> 1</span> <span class="k">class</span> <span class="nc">MinMax</span>
+<span class="lineno"> 2</span>   <span class="kp">attr_reader</span> <span class="ss">:min</span><span class="p">,</span> <span class="ss">:max</span>
+<span class="lineno"> 3</span> 
+<span class="lineno"> 4</span>   <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">min</span><span class="p">,</span> <span class="n">max</span><span class="p">)</span>
+<span class="lineno"> 5</span>     <span class="vi">@min</span><span class="p">,</span> <span class="vi">@max</span> <span class="o">=</span> <span class="n">min</span><span class="p">,</span> <span class="n">max</span>
+<span class="lineno"> 6</span>   <span class="k">end</span>
+<span class="lineno"> 7</span> 
+<span class="lineno"> 8</span>   <span class="k">def</span> <span class="nf">+</span> <span class="n">other</span>
+<span class="lineno"> 9</span>     <span class="n">new_min</span> <span class="o">=</span> <span class="n">min</span> <span class="o">+</span> <span class="n">other</span><span class="o">.</span><span class="n">min</span>
+<span class="lineno">10</span>     <span class="n">new_max</span> <span class="o">=</span> <span class="n">max</span> <span class="o">+</span> <span class="n">other</span><span class="o">.</span><span class="n">max</span>
+<span class="lineno">11</span>     <span class="nb">self</span><span class="o">.</span><span class="n">class</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">new_min</span><span class="p">,</span> <span class="n">new_max</span><span class="p">)</span>
+<span class="lineno">12</span>   <span class="k">end</span>
+<span class="lineno">13</span> 
+<span class="lineno">14</span>   <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">zero</span>
+<span class="lineno">15</span>     <span class="kp">new</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="lineno">16</span>   <span class="k">end</span>
+<span class="lineno">17</span> <span class="k">end</span></code></pre></div>
+
+<p>We can use this new class like this:</p>
+
+<div class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="lineno"> 1</span> <span class="no">MinMax</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="lineno"> 2</span> <span class="c1">#=&gt; #&lt;MinMax:0x007ff19604e2e8 @min=1, @max=10&gt;</span>
+<span class="lineno"> 3</span> 
+<span class="lineno"> 4</span> <span class="no">MinMax</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="lineno"> 5</span> <span class="c1">#=&gt; #&lt;MinMax:0x007ff193045650 @min=2, @max=10&gt;</span>
+<span class="lineno"> 6</span> 
+<span class="lineno"> 7</span> <span class="no">MinMax</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span> <span class="o">+</span> <span class="no">MinMax</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="lineno"> 8</span> <span class="c1">#=&gt; #&lt;MinMax:0x007ff1950009b8 @min=3, @max=20&gt;</span>
+<span class="lineno"> 9</span> 
+<span class="lineno">10</span> <span class="no">MinMax</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span> <span class="o">+</span> <span class="o">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">10</span><span class="o">]</span>
+<span class="lineno">11</span> <span class="c1">#=&gt; #&lt;MinMax:0x007ff1950009b8 @min=3, @max=20&gt;</span></code></pre></div>
+
+<p>Now we can refactor Estimator like so:</p>
+
+<div class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="lineno">1</span> <span class="k">class</span> <span class="nc">Estimator</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+<span class="lineno">2</span>   <span class="n">has_many</span> <span class="ss">:customers</span>
+<span class="lineno">3</span> 
+<span class="lineno">4</span>   <span class="k">def</span> <span class="nf">projection</span>
+<span class="lineno">5</span>     <span class="n">customers</span><span class="o">.</span><span class="n">inject</span><span class="p">(</span><span class="no">MinMax</span><span class="o">.</span><span class="n">zero</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">minmax</span><span class="p">,</span> <span class="n">customer</span><span class="o">|</span>
+<span class="lineno">6</span>       <span class="n">minmax</span> <span class="o">+</span> <span class="n">customer</span><span class="o">.</span><span class="n">projection</span>
+<span class="lineno">7</span>     <span class="k">end</span>
+<span class="lineno">8</span>   <span class="k">end</span>
+<span class="lineno">9</span> <span class="k">end</span></code></pre></div>
+
+<p>Which can now be written even more succinctly as:</p>
+
+<div class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="lineno">1</span> <span class="k">class</span> <span class="nc">Estimator</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+<span class="lineno">2</span>   <span class="n">has_many</span> <span class="ss">:customers</span>
+<span class="lineno">3</span> 
+<span class="lineno">4</span>   <span class="k">def</span> <span class="nf">projection</span>
+<span class="lineno">5</span>     <span class="n">customers</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:projection</span><span class="p">)</span><span class="o">.</span><span class="n">inject</span><span class="p">(</span><span class="no">MinMax</span><span class="o">.</span><span class="n">zero</span><span class="p">,</span> <span class="ss">:+</span><span class="p">)</span>
+<span class="lineno">6</span>   <span class="k">end</span>
+<span class="lineno">7</span> <span class="k">end</span></code></pre></div>
+
+<p>And we&#39;re done! Now our final implementation code looks like this:</p>
+
+<div class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="lineno"> 1</span> <span class="k">class</span> <span class="nc">Estimator</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+<span class="lineno"> 2</span>   <span class="n">has_many</span> <span class="ss">:customers</span>
+<span class="lineno"> 3</span> 
+<span class="lineno"> 4</span>   <span class="k">def</span> <span class="nf">projection</span>
+<span class="lineno"> 5</span>     <span class="n">customers</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:projection</span><span class="p">)</span><span class="o">.</span><span class="n">inject</span><span class="p">(</span><span class="no">MinMax</span><span class="o">.</span><span class="n">zero</span><span class="p">,</span> <span class="ss">:+</span><span class="p">)</span>
+<span class="lineno"> 6</span>   <span class="k">end</span>
+<span class="lineno"> 7</span> <span class="k">end</span>
+<span class="lineno"> 8</span> 
+<span class="lineno"> 9</span> <span class="k">class</span> <span class="nc">Customer</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+<span class="lineno">10</span>   <span class="n">belongs_to</span> <span class="ss">:rate</span>
+<span class="lineno">11</span>   <span class="n">belongs_to</span> <span class="ss">:estimator</span>
+<span class="lineno">12</span> 
+<span class="lineno">13</span>   <span class="k">def</span> <span class="nf">projection</span>
+<span class="lineno">14</span>     <span class="n">rate</span> <span class="o">*</span> <span class="n">revenue</span>
+<span class="lineno">15</span>   <span class="k">end</span>
+<span class="lineno">16</span> <span class="k">end</span>
+<span class="lineno">17</span> 
+<span class="lineno">18</span> <span class="k">class</span> <span class="nc">Rate</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+<span class="lineno">19</span>   <span class="k">def</span> <span class="nf">min</span>
+<span class="lineno">20</span>     <span class="nb">self</span><span class="o">[</span><span class="ss">:min</span><span class="o">]</span> <span class="o">/</span> <span class="mi">100</span><span class="o">.</span><span class="n">to_f</span>
+<span class="lineno">21</span>   <span class="k">end</span>
+<span class="lineno">22</span> 
+<span class="lineno">23</span>   <span class="k">def</span> <span class="nf">max</span>
+<span class="lineno">24</span>     <span class="nb">self</span><span class="o">[</span><span class="ss">:max</span><span class="o">]</span> <span class="o">/</span> <span class="mi">100</span><span class="o">.</span><span class="n">to_f</span>
+<span class="lineno">25</span>   <span class="k">end</span>
+<span class="lineno">26</span> 
+<span class="lineno">27</span>   <span class="k">def</span> <span class="nf">*</span> <span class="n">other</span>
+<span class="lineno">28</span>     <span class="o">[</span>
+<span class="lineno">29</span>       <span class="n">min</span> <span class="o">*</span> <span class="n">other</span><span class="p">,</span>
+<span class="lineno">30</span>       <span class="n">max</span> <span class="o">*</span> <span class="n">other</span>
+<span class="lineno">31</span>     <span class="o">]</span>
+<span class="lineno">32</span>   <span class="k">end</span>
+<span class="lineno">33</span> <span class="k">end</span>
+<span class="lineno">34</span> 
+<span class="lineno">35</span> <span class="k">class</span> <span class="nc">MinMax</span>
+<span class="lineno">36</span>   <span class="kp">attr_reader</span> <span class="ss">:min</span><span class="p">,</span> <span class="ss">:max</span>
+<span class="lineno">37</span> 
+<span class="lineno">38</span>   <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">min</span><span class="p">,</span> <span class="n">max</span><span class="p">)</span>
+<span class="lineno">39</span>     <span class="vi">@min</span><span class="p">,</span> <span class="vi">@max</span> <span class="o">=</span> <span class="n">min</span><span class="p">,</span> <span class="n">max</span>
+<span class="lineno">40</span>   <span class="k">end</span>
+<span class="lineno">41</span> 
+<span class="lineno">42</span>   <span class="k">def</span> <span class="nf">+</span> <span class="n">other</span>
+<span class="lineno">43</span>     <span class="n">new_min</span> <span class="o">=</span> <span class="n">min</span> <span class="o">+</span> <span class="n">other</span><span class="o">.</span><span class="n">min</span>
+<span class="lineno">44</span>     <span class="n">new_max</span> <span class="o">=</span> <span class="n">max</span> <span class="o">+</span> <span class="n">other</span><span class="o">.</span><span class="n">max</span>
+<span class="lineno">45</span>     <span class="nb">self</span><span class="o">.</span><span class="n">class</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">new_min</span><span class="p">,</span> <span class="n">new_max</span><span class="p">)</span>
+<span class="lineno">46</span>   <span class="k">end</span>
+<span class="lineno">47</span> 
+<span class="lineno">48</span>   <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">zero</span>
+<span class="lineno">49</span>     <span class="kp">new</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="lineno">50</span>   <span class="k">end</span>
+<span class="lineno">51</span> <span class="k">end</span></code></pre></div>
+
+<p>We have a bit more code than before, but the complexity of individual pieces
+has gone down. One objection I sometimes run into when proposing refactorings
+like this is that the complexity of the system as a whole has gone up. This is
+certainly true. In fact, we can use tools to assess what has changed. I like to
+use the Ruby tool <a href="https://github.com/seattlerb/flog">Flog</a>.</p>
+
+<p>Here&#39;s the scores before the refactoring:</p>
+
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="lineno">1</span> 35.4: flog total
+<span class="lineno">2</span>  5.9: flog/method average
+<span class="lineno">3</span> 
+<span class="lineno">4</span> 20.7: Estimator#projection             lib/estimator.rb:6
+<span class="lineno">5</span>  4.1: Rate#min                         lib/rate.rb:4</code></pre></div>
+
+<p>And after:</p>
+
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="lineno">1</span> 46.1: flog total
+<span class="lineno">2</span>  3.8: flog/method average
+<span class="lineno">3</span> 
+<span class="lineno">4</span>  9.2: MinMax#+                         lib/min_max.rb:8
+<span class="lineno">5</span>  7.5: Estimator#projection             lib/estimator.rb:7
+<span class="lineno">6</span>  4.8: Rate#*                           lib/rate.rb:12
+<span class="lineno">7</span>  4.4: main#none
+<span class="lineno">8</span>  4.1: Rate#min                         lib/rate.rb:4</code></pre></div>
+
+<p>As you can see, the overall complexity of the system went up, as expected. But
+now the most complex method is a little less than half of what it was before.
+I prefer for the complexity of my pieces to go down even if the total
+complexity goes up, because there is a point in every software project where
+you can no longer understand the whole thing anyway. When that happens, I would
+like to have small pieces I can easily understand and work with.</p>
+
+<h2>So what&#39;s wrong with this kind of testing?</h2>
+
+<p>If you&#39;ve been paying attention, or you&#39;re familiar with this kind of testing,
+you may have had some hesitancy about using stubs and mocks to test. They have
+problems themselves. Whenever you stub a method and make it return a value, you
+are stating that you expect that method to exist and to return a value like the
+one you are returning. If that code ever changes, you won&#39;t know, your test with
+the stubbed value will continue to work.</p>
+
+<p>Thankfully, there are ways to help mitigate this problem. RSpec 3 adds
+<code>instance_double</code> and <code>class_double</code> which won&#39;t allow you to stub methods
+that don&#39;t exist. This gets us part of the way there, but it won&#39;t ensure that
+those methods return anything like what we say they return in our stubs.</p>
+
+<p>So the problem remains. It is possible to write tests this way, change
+the behaviour of collaborators, and have your tests still pass. This is not
+good. The test we started with doesn&#39;t have this problem. It will throw errors
+when methods on collaborating objects change because we are dealing with real
+collaborators.</p>
+
+<p>There&#39;s a place for both kinds of tests. It&#39;s not that you should always test
+like this, or always test like that. It seems to me that the best tests for
+ensuring your system works (like our first test), are not the same as the best
+tests for getting the most design benefit out of TDD. Personally, I use
+factories less often than I did in the past, and use this technique more often.
+I supplement this with more integration tests so I can maintain confidence that
+everything is still working. This is what&#39;s working for me right now.</p>
+
+<p>If you have any questions or comments about this post or the code discussed,
+I would love to hear them! You can comment here, on the
+<a href="https://github.com/ericroberts/factories">repository</a>, or tweet at me at
+<a href="https://twitter.com/eroberts">@eroberts</a>.</p>
+
+<p>Good luck with your testing!</p>
+
+<h2 id="references">References</h2>
+
+<ol>
+  <li>
+    <a
+  href="http://blog.testdouble.com/posts/2014-01-25-the-failures-of-intro-to-tdd.html">
+      The Failures of "Intro to TDD"
+    </a>
+  </li>
+</ol>
+
+    </div>
+  </article>
+</section>
+<section class="more-reading">
+  <div class="row">
+    <div class="large-12 columns">
+      <h1>Some other stuff I've written...</h1>
+      <ul class="large-block-grid-4">
+        
+          
+        
+          
+          <li>
+            <h4>16 Aug 2014</h4>
+            <h2><a href="/2014/08/16/o-captain-my-captain/">O Captain! My Captain!</a></h2>
+          </li>
+          
+        
+          
+          <li>
+            <h4>04 Jun 2014</h4>
+            <h2><a href="/2014/06/04/anyone-can-make-it-work/">Anyone Can Make it Work Right Now</a></h2>
+          </li>
+          
+        
+          
+          <li>
+            <h4>27 May 2014</h4>
+            <h2><a href="/2014/05/27/you-already-do-tdd/">You're Already Doing TDD</a></h2>
+          </li>
+          
+        
+          
+          <li>
+            <h4>02 May 2014</h4>
+            <h2><a href="/2014/05/02/red-green-refactor/">Red, Green, Refactor</a></h2>
+          </li>
+          
+        
+          
+          <li>
+            <h4>27 Feb 2014</h4>
+            <h2><a href="/2014/02/27/bug-free-software/">Bug Free Software - Is it Possible?</a></h2>
+          </li>
+          
+        
+          
+          <li>
+            <h4>31 Jan 2014</h4>
+            <h2><a href="/2014/01/31/regular-and-retina-sprites-with-compass/">Regular and Retina Sprites with Compass</a></h2>
+          </li>
+          
+        
+          
+          <li>
+            <h4>10 Nov 2013</h4>
+            <h2><a href="/2013/11/10/the-joy-of-ruby-avdi-grimm/">The Joy of Ruby - Avdi Grimm</a></h2>
+          </li>
+          
+        
+          
+          <li>
+            <h4>04 Nov 2013</h4>
+            <h2><a href="/2013/11/04/how-to-turn-your-raspberry-pi-into-a-wireless-airplay-receiver/">How to Turn Your Raspberry Pi Into a Wireless AirPlay Reciever</a></h2>
+          </li>
+          
+        
+          
+          <li>
+            <h4>17 Oct 2013</h4>
+            <h2><a href="/2013/10/17/building-objects-in-the-session-with-rails-and-wicked-wizard/">Building Objects in the Session with Rails and Wicked Wizard</a></h2>
+          </li>
+          
+        
+          
+          <li>
+            <h4>31 Jul 2013</h4>
+            <h2><a href="/2013/07/31/cassette-style-nav-bar-that-auto-fills-available-width/">Cassette Style Nav Bar That Auto-Fills Available Width</a></h2>
+          </li>
+          
+        
+          
+          <li>
+            <h4>13 Feb 2013</h4>
+            <h2><a href="/2013/02/13/this-ideas-thing-is-hard/">This Ideas Thing is Hard</a></h2>
+          </li>
+          
+        
+          
+          <li>
+            <h4>16 Jan 2013</h4>
+            <h2><a href="/2013/01/16/how-a-coworking-space-ruined-me/">How a Coworking Space Ruined Me</a></h2>
+          </li>
+          
+        
+      </ul>
+    </div>
+  </div>
+</section>
+
+  </section>
+
+  <footer>
+    <div class="row">
+    </div>
+  </footer>
+  <script type="text/javascript">
+
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-16269631-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+
+  </script>
+
+  <script type="text/javascript">
+    window.analytics=window.analytics||[],window.analytics.methods=["identify","group","track","page","pageview","alias","ready","on","once","off","trackLink","trackForm","trackClick","trackSubmit"],window.analytics.factory=function(t){return function(){var a=Array.prototype.slice.call(arguments);return a.unshift(t),window.analytics.push(a),window.analytics}};for(var i=0;i<window.analytics.methods.length;i++){var key=window.analytics.methods[i];window.analytics[key]=window.analytics.factory(key)}window.analytics.load=function(t){if(!document.getElementById("analytics-js")){var a=document.createElement("script");a.type="text/javascript",a.id="analytics-js",a.async=!0,a.src=("https:"===document.location.protocol?"https://":"http://")+"cdn.segment.io/analytics.js/v1/"+t+"/analytics.min.js";var n=document.getElementsByTagName("script")[0];n.parentNode.insertBefore(a,n)}},window.analytics.SNIPPET_VERSION="2.0.9",
+    window.analytics.load("ixl7f3o7kf");
+    window.analytics.page();
+  </script>
+</body>
+</html>
